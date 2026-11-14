@@ -71,7 +71,7 @@ dt{font:600 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color
 #tl::before{content:"";position:absolute;left:0;right:0;bottom:6px;height:1px;background:var(--ln)}
 .tk{position:absolute;bottom:0;width:16px;height:24px;transform:translateX(-50%);display:flex;align-items:flex-end;justify-content:center}
 .tk i{width:1px;height:var(--h);margin-bottom:6px;background:var(--lb)}
-.tk:hover i{background:var(--ink);width:2px}.tk.on i{background:var(--a);width:2px}.tk.on::after{content:"";position:absolute;bottom:2px;width:9px;height:9px;background:var(--a);box-shadow:0 0 0 2px #000}
+.tk:hover i{background:var(--ink);width:2px}.tk.on i{background:var(--a);width:2px}.tk.ld i{opacity:.3}.tk.cur i{animation:ld .8s ease-in-out infinite alternate}@keyframes ld{to{opacity:1;height:calc(var(--h) + 8px)}}.tk.on::after{content:"";position:absolute;bottom:2px;width:9px;height:9px;background:var(--a);box-shadow:0 0 0 2px #000}
 .keys{left:16px;right:16px;bottom:10px;display:flex;gap:22px;font:600 10px var(--disp);letter-spacing:.2em;text-transform:uppercase;color:var(--lb);white-space:nowrap;overflow:hidden}
 kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color:var(--a)}
 #s{position:fixed;left:50%;bottom:116px;transform:translateX(-50%);z-index:3;padding:5px 16px;border-left:3px solid var(--a);background:rgba(0,0,0,.65);font:600 12px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--a);text-align:center;max-width:90%}
@@ -162,7 +162,7 @@ function show(n){
   k=(n+F.length)%F.length;const f=F[k];L={...W,m:f.m};
   cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);
   $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`;sc();
-  [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",j==k));
+  [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",b.dataset.j==k));
 }
 const stop=()=>{fl=0;clearInterval(tm);tm=0;$("pl").textContent="Play"};
 const play=()=>{if(F.length<2)return;fl=0;$("pl").textContent="Pause";tm=setInterval(()=>show(k+1),700)};
@@ -181,15 +181,16 @@ async function load(n,ra,dec,z=.25,keep){
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
     const S=Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))]),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",t0=+S[0][t],t1=+S[S.length-1][t];
+    $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[t]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
     W={ra,dec,z};$("t0").textContent=iso(t0);$("t1").textContent=iso(t1);
     for(let j=0;j<S.length;j++){
-      const r=S[j];st(`Loading image ${j+1} of ${S.length}…`);
+      const r=S[j],B=$("tl").children[j];B.classList.add("cur");st(`Loading image ${j+1} of ${S.length}…`);
       try{
         const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=${z}`),{signal:sg})).arrayBuffer();if(sg.aborted)return;
         const q=fits(b),m=+r[t],f={c:paint(q),m:q.m,t:m,d:iso(m),w:+r[w]?(r[w]*1e6).toFixed(2):""};
-        $("tl").insertAdjacentHTML("beforeend",`<button class="tk" data-j="${F.push(f)-1}" title="${f.d} · ${f.w} µm" style="left:calc(8px + (100% - 16px)*${t1>t0?(m-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+f.w||1))-.75)/4.25*14}px"><i></i></button>`);
+        B.dataset.j=F.push(f)-1;B.className="tk";B.title=`${f.d} · ${f.w} µm`;
         ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(fl?F.length-1:k);
-      }catch(e){if(e.name=="AbortError")throw e}
+      }catch(e){if(e.name=="AbortError")throw e;B.remove()}
     }
     if(!F.length)return st("No usable images came back from IRSA",1);
     st("");dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
@@ -209,7 +210,7 @@ $("f").onsubmit=e=>{
   load("Custom",ra,dec);
 };
 $("pl").onclick=toggle;$("pv").onclick=()=>{stop();show(k-1)};$("nx").onclick=()=>{stop();show(k+1)};
-$("tl").onclick=e=>{const b=e.target.closest(".tk");if(b){stop();show(+b.dataset.j)}};
+$("tl").onclick=e=>{const b=e.target.closest(".tk");if(b&&b.dataset.j){stop();show(+b.dataset.j)}};
 addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(e.key=="ArrowLeft")$("pv").click();else if(e.key=="ArrowRight")$("nx").click();else if(e.key==" "){e.preventDefault();$("pl").disabled||toggle()}});
 
 function sc(){const f=F[k];if(!f||!f.m||!L)return;const[a,b,c,d]=f.m,D=a*d-b*c;if(!D)return;
