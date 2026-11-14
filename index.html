@@ -333,16 +333,22 @@ const tab=t=>{document.body.dataset.tab=t;[...$("tb").children].forEach(b=>b.cla
 gosp=()=>{tab("sp");if(!wm&&V){wm=1;load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>document.body.dataset.tab=="sp"?tab("t"):gosp();
 // SKY: Aladin Lite all-sky map (WISE infrared), loaded on first use. Click anywhere -> SPHEREx cutouts + spectrum + ice scan for that spot
 let al,alp;
-const aladin=()=>alp||(alp=new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js";s.onerror=no;
-  s.onload=()=>A.init.then(()=>{al=A.aladin("#ak",{survey:"CDS/P/allWISE/color",fov:60,showReticle:true,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
-    al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});ok(al)}).catch(no);document.head.append(s)}).catch(e=>{alp=0;throw e})),
+const aladin=()=>alp||(alp=(async()=>{
+  // try several hosts for the library: some networks block one of them
+  const U=["https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js","https://aladin.u-strasbg.fr/AladinLite/api/v3/latest/aladin.js","https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js","https://cdn.jsdelivr.net/npm/aladin-lite@3.9.0-beta/dist/aladin.js"],bad=[],
+  ld=u=>new Promise((ok,no)=>{const s=document.createElement("script"),t=setTimeout(()=>{s.remove();no()},6000);s.src=u;s.onload=()=>{clearTimeout(t);window.A&&A.init?ok():no()};s.onerror=()=>{clearTimeout(t);no()};document.head.append(s)});
+  let up=0;for(const u of U){try{await ld(u);up=1;break}catch{const h=new URL(u).hostname;bad.includes(h)||bad.push(h)}}
+  if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
+  await A.init;
+  al=A.aladin("#ak",{survey:"CDS/P/allWISE/color",fov:60,showReticle:true,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
+  al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});return al})().catch(e=>{alp=0;throw e})),
 skypick=(ra,dec)=>{if(!Number.isFinite(ra)||!Number.isFinite(dec))return;ra=+(((ra%360)+360)%360).toFixed(4);dec=+Math.max(-89.9,Math.min(89.9,dec)).toFixed(4);load(`SKY ${ra.toFixed(2)} ${dec>0?"+":""}${dec.toFixed(2)}`,ra,dec)},
 gosk=async()=>{tab("sk");
   if(fb&&$("ak").contains(fb)){sky2();return}
   try{
     if(!document.createElement("canvas").getContext("webgl2"))throw Error("NO WEBGL2 ON THIS DEVICE");
     al||st("Loading sky map…");
-    const a=await Promise.race([aladin(),new Promise((_,r)=>setTimeout(()=>r(Error("ALADIN TIMED OUT")),12000))]);
+    const a=await Promise.race([aladin(),new Promise((_,r)=>setTimeout(()=>r(Error("ALADIN TIMED OUT")),30000))]);
     bz||st("");if(!sk())return;(a.gotoRaDec||a.gotoPosition).call(a,V.ra,V.dec);dispatchEvent(new Event("resize"))
   }catch(e){console.error(e);bz||st("");skyfb(e&&e.message||"ALADIN COULDN'T LOAD (BLOCKED OR OFFLINE)")}};
 // BUILT-IN SKY MAP: equirectangular all-sky chart (RA/Dec grid, galactic plane, ecliptic, presets). Needs no network or WebGL; used when Aladin can't load. Click anywhere -> SPHEREx
