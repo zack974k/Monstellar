@@ -118,7 +118,7 @@ st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":""
 hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
 dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
-let F=[],k=0,tm,ac,V,L,W,dirty;
+let F=[],k=0,tm,ac,V,L,W,dirty,bz;
 const co=()=>{$("ra").textContent=hms(V.ra);$("de").textContent=dms(V.dec);$("fv").textContent=`${V.z.toFixed(3)}° (${(V.z*60).toFixed(1)}′)`};
 
 // minimal FITS reader: walks the HDUs and returns the first 2D image (SPHEREx cutout: IMAGE ext)
@@ -169,7 +169,7 @@ const play=()=>{if(F.length<2)return;$("pl").textContent="Pause";tm=setInterval(
 const toggle=()=>tm?stop():play();
 
 async function load(n,ra,dec,z=.25,keep){
-  stop();ac?.abort();ac=new AbortController;const sg=ac.signal;
+  stop();ac?.abort();ac=new AbortController;const sg=ac.signal;bz=1;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="");$("tl").innerHTML="";
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
   V={n,ra,dec,z};$("tt").textContent=n;co();["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent="");$("wb").style.setProperty("--p","0%");
@@ -197,7 +197,7 @@ async function load(n,ra,dec,z=.25,keep){
     if(e.name=="AbortError")return;
     console.error(e);
     st(PROXY?"Couldn’t reach NASA IRSA through the proxy":"Browser blocked NASA IRSA (no CORS). Set PROXY in index.html",1);
-  }
+  }finally{if(sg==ac.signal)bz=0}
 }
 
 T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=n;b.title=`RA ${ra}° Dec ${dec}°`;b.innerHTML=`${p2(i+1)}<span>${n}</span><small>${ra}° ${dec>0?"+":""}${dec}°</small>`;b.onclick=()=>load(n,ra,dec);$("nav").append(b)});
@@ -265,7 +265,7 @@ requestAnimationFrame(function tick(t){
     cv.style.transform=`translate(${-(d*u-b*w)/D*s}px,${(a*w-c*u)/D*s}px) scale(${L.z/V.z})`;
   }
   hud();
-  if(dirty&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
+  if(dirty&&!bz&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
   requestAnimationFrame(tick)
 });
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
