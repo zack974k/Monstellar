@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>SPHEREx Live Flipbook</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0b0d17;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    #toolbar {
+      padding: 12px;
+      background-color: #161b2e;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid #2c3554;
+    }
+    button {
+      background-color: #2b59c3;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    button:hover {
+      background-color: #3b6ee0;
+    }
+    button:disabled {
+      background-color: #444c66;
+      cursor: not-allowed;
+    }
+    button.play-btn {
+      background-color: #1f8a4c;
+      font-weight: bold;
+    }
+    input {
+      background-color: #0b0d17;
+      border: 1px solid #3c486b;
+      color: white;
+      padding: 7px 10px;
+      border-radius: 6px;
+      width: 150px;
+      font-size: 13px;
+    }
+    #status {
+      margin-left: auto;
+      font-size: 13px;
+      color: #a8b5d6;
+    }
+    #sky-map {
+      flex: 1;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="toolbar">
+    <strong>NASA Test Stars:</strong>
+    <button onclick="loadTarget(269.452, 4.693, 'Barnard\'s Star')">Barnard's Star</button>
+    <button onclick="loadTarget(331.077, -56.783, 'Epsilon Indi B')">Epsilon Indi B</button>
+    <button onclick="loadTarget(133.795, -7.245, 'WISE 0855')">WISE 0855</button>
+    <button onclick="loadTarget(76.956, 30.401, 'RW Aurigae')">RW Aurigae</button>
+    <button onclick="loadTarget(248.125, 66.764, 'R Draconis')">R Draconis</button>
+
+    <input type="text" id="custom-coords" placeholder="RA, Dec (e.g. 269.45, 4.69)">
+    <button onclick="searchCustom()">Search</button>
+
+    <button class="play-btn" id="flip-btn" onclick="toggleFlipbook()" disabled>Play Flipbook</button>
+    <span id="status">Click a star to fetch live NASA SPHEREx cutouts</span>
+  </div>
+
+  <div id="sky-map"></div>
+
+  <script src="https://unistra.fr" charset="utf-8"></script>
+  <script>
+    let map;
+    let frames = [];
+    let currentFrameIndex = 0;
+    let isPlaying = false;
+    let flipTimer = null;
+    let fetchController = null;
+
+    // Start the progressive zoomable sky map
+    A.init.then(() => {
+      map = A.aladin("#sky-map", {
+        survey: "P/2MASS/color",
+        fov: 0.15,
+        target: "269.452 4.693",
+        showCooGrid: false
+      });
+    });
+
+    function searchCustom() {
+      const val = document.getElementById("custom-coords").value.trim();
+      const parts = val.split(",").map(s => parseFloat(s.trim()));
+      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        loadTarget(parts[0], parts[1], `Custom (${parts[0]}, ${parts[1]})`);
+      } else {
+        alert("Enter coordinates as: RA, Dec (for example: 269.452, 4.693)");
+      }
+    }
+
+    async function loadTarget(ra, dec, label) {
+      const status = document.getElementById("status");
+      const flipBtn = document.getElementById("flip-btn");
+
+      // Stop any running flipbook and cancel unfinished downloads
+      stopFlipbook();
+      if (fetchController) fetchController.abort();
+      fetchController = new AbortController();
+
+      // Clear old image layers from memory
+      frames.forEach(f => {
+        try { map.removeOverlayImageLayer(f.layer); } catch (e) {}
+      });
+      frames = [];
+      flipBtn.disabled = true;
+
+      // Move camera to the target
+      if (map) {
+        map.gotoRaDec(ra, dec);
+        map.setFoV(0.08);
+      }
+
+      status.textContent = `Asking NASA SPHEREx archive for ${label}...`;
+
+      try {
+        // Step 1: Query NASA IRSA SIA2 endpoint for SPHEREx images at (ra, dec)
+        const siaUrl = `https://caltech.edu{ra}%20${dec}%200.02&RESPONSEFORMAT=json`;
+        const response = await fetch(siaUrl, { signal: fetchController.signal });
+        const json = await response.json();
+
+        // Parse columns and rows from IRSA JSON response
+        const fields = json.metadata.map(m => m.name);
+        const urlIdx = fields.indexOf("access_url");
+        const timeIdx = fields.indexOf("t_min");
+
+        if (!json.data || json.data.length === 0) {
+          status.textContent = `No SPHEREx exposures found yet for ${label}.`;
+          return;
+        }
+
+        // Sort oldest to newest and keep up to 10 frames so the user's device stays fast
+        const sortedRows = json.data
+          .filter(row => row[urlIdx])
+          .sort((a, b) => a[timeIdx] - b[timeIdx])
+          .slice(0, 10);
+
+        status.textContent = `Found ${sortedRows.length} SPHEREx scans. Loading cropped cutouts...`;
+
+        // Step 2: Build server-side cropped cutout URLs (?center=RA,DEC&size=3arcmin)
+        for (let i = 0; i < sortedRows.length; i++) {
+          const rawUrl = sortedRows[i][urlIdx];
+          const mjd = sortedRows[i][timeIdx];
+          const joinChar = rawUrl.includes("?") ? "&" : "?";
+          const cutoutUrl = `${rawUrl}${joinChar}center=${ra},${dec}deg&size=3arcmin`;
+
+          // Convert MJD timestamp into a readable date
+          const dateStr = mjd
+            ? new Date((mjd - 40587) * 86400000).toISOString().split("T")[0]
+            : `Frame ${i + 1}`;
+
+          // Add FITS cutout directly as an Aladin Lite overlay layer
+          const layer = map.displayFITS(cutoutUrl, {
+            name: `spherex_${i}`,
+            opacity: i === 0 ? 1.0 : 0.0
+          });
+
+          frames.push({ layer, dateStr });
+        }
+
+        currentFrameIndex = 0;
+        flipBtn.disabled = false;
+        status.textContent = `Ready! Showing ${frames[0].dateStr} (1 of ${frames.length})`;
+
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.error(err);
+        status.textContent = `Could not reach NASA IRSA directly (check browser console or CORS).`;
+      }
+    }
+
+    function showFrame(index) {
+      frames.forEach((f, idx) => {
+        if (f.layer && f.layer.setOpacity) {
+          f.layer.setOpacity(idx === index ? 1.0 : 0.0);
+        }
+      });
+      const status = document.getElementById("status");
+      status.textContent = `Frame ${index + 1}/${frames.length} — Date: ${frames[index].dateStr}`;
+    }
+
+    function toggleFlipbook() {
+      if (isPlaying) {
+        stopFlipbook();
+      } else {
+        startFlipbook();
+      }
+    }
+
+    function startFlipbook() {
+      if (frames.length < 2) return;
+      isPlaying = true;
+      document.getElementById("flip-btn").textContent = "Pause Flipbook";
+
+      flipTimer = setInterval(() => {
+        currentFrameIndex = (currentFrameIndex + 1) % frames.length;
+        showFrame(currentFrameIndex);
+      }, 700);
+    }
+
+    function stopFlipbook() {
+      isPlaying = false;
+      clearInterval(flipTimer);
+      document.getElementById("flip-btn").textContent = "Play Flipbook";
+    }
+  </script>
+</body>
+</html>
