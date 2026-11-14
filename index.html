@@ -340,7 +340,7 @@ const aladin=()=>alp||(alp=(async()=>{
   let up=0;for(const u of U){try{await ld(u);up=1;break}catch{const h=new URL(u).hostname;bad.includes(h)||bad.push(h)}}
   if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
   await A.init;
-  al=A.aladin("#ak",{survey:"CDS/P/allWISE/color",fov:60,showReticle:true,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
+  al=A.aladin("#ak",{survey:"https://skies.esac.esa.int/DSSColor/",fov:60,showReticle:true,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
   al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});return al})().catch(e=>{alp=0;throw e})),
 skypick=(ra,dec)=>{if(!Number.isFinite(ra)||!Number.isFinite(dec))return;ra=+(((ra%360)+360)%360).toFixed(4);dec=+Math.max(-89.9,Math.min(89.9,dec)).toFixed(4);load(`SKY ${ra.toFixed(2)} ${dec>0?"+":""}${dec.toFixed(2)}`,ra,dec)},
 gosk=async()=>{tab("sk");
