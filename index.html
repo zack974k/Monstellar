@@ -93,7 +93,8 @@ body[data-p=mono] #ak canvas{filter:grayscale(1)}
 #bk:hover,.ctl>button.on{background:var(--a);color:#000}
 #bl{display:none;left:50%;bottom:92px;transform:translateX(-50%);padding:6px 16px;font:700 13px var(--disp);letter-spacing:.2em;color:var(--a);white-space:nowrap;pointer-events:none}
 body.blk:not([data-tab=sk]) #bl{display:block}
-#lmp{right:16px;top:52px;width:320px;font-size:12px;line-height:1.45}
+#lg{right:16px;top:52px;width:380px}#lg .pb{padding:16px 8px 6px}#lo{height:230px;overflow:auto;font-size:10.5px;line-height:1.35;scrollbar-width:thin;word-break:break-all;white-space:pre-wrap}#lo div{padding:2px 0;border-bottom:1px solid var(--ln)}#lo b{margin-right:6px;color:var(--a)}#lo i{font-style:normal;color:var(--lb);margin-right:6px}#lo .r b{color:var(--ink)}#lo .e,#lo .e b{color:var(--er)}
+#lmp{right:16px;top:318px;width:320px;font-size:12px;line-height:1.45}
 #pg{width:0;height:0;pointer-events:none}
 #pg::before,#pg::after{content:"";position:absolute;width:56px;height:56px;border:1.5px solid var(--a);opacity:0;transform:translate(-50%,-50%) scale(.2)}
 #pg::after{border-radius:50%}
@@ -141,11 +142,12 @@ body[data-tab=sk] #sr{display:block}
 <div id="s">Select a target</div>
 <div id="pg" class="ui"></div>
 <div id="bl" class="ui pnl"></div>
+<div id="lg" class="ui pnl"><h2>Cmd log</h2><div class="pb"><div id="lo"></div></div></div>
 <div id="lmp" class="ui pnl" hidden><h2>Limits</h2><div class="pb">Exploration tool, not a detection. SPHEREx frames from different dates also differ in wavelength, so a brightness change alone is not proof of motion: Blink only pairs frames within 0.05 µm, more than 1 h apart. The ice readout is a quick look (3×3 median minus field median, 3σ), not a calibrated product. Data: NASA/IPAC IRSA, SPHEREx QR3.</div></div>
 <div id="sr" class="ui pnl">SKY MAP · CLICK ANYWHERE TO LOAD SPHEREx</div>
 <div class="ui brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
 <div class="ui tabs" id="tb"><button class="on" data-t="t">Target</button><button data-t="sp">Spectrum</button><button data-t="ob">Readout</button><button data-t="sk">Sky</button></div>
-<div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Display palette (C)">DISP AMB</button>
+<div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="lgb">LOG</button><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Display palette (C)">DISP AMB</button>
   <button class="ic" id="fs" title="Fullscreen (F) · Hide interface (H) · Fit image (Z) · Move (WASD) · Zoom (+/− or scroll) · Drag/pinch · Speed ([ ]) · Wavelength order (M)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
 <div id="lc" class="ui">
 <div id="gt">
@@ -180,15 +182,16 @@ dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
 let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,sp=700;
 const M={},M0=fetch("cut/m.json").then(r=>r.json()).then(j=>Object.assign(M,j)).catch(()=>0);
-const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg,tx,pc)=>{if(!C.has(u)){let p=FL.get(u);if(!p){p=(async()=>{
+const lg=(k,m,c)=>{const o=$("lo"),d=document.createElement("div");d.className=c||"";d.innerHTML=`<i>${new Date().toISOString().slice(11,23)}</i><b>${k}</b>`;d.append(m);o.append(d);while(o.children.length>300)o.firstChild.remove();o.scrollTop=o.scrollHeight};
+const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg,tx,pc)=>{const kd=tx?"XML":"FITS";if(!C.has(u)){let p=FL.get(u);if(p)lg("JOIN",`${kd} already in flight, sharing it\n    ${u}`);if(!p){p=(async()=>{
   const ch=pc&&window.caches?await caches.open("mst1").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
   if(hit&&tx&&Date.now()-hit.headers.get("x-t")>6048e5)hit=0;
-  if(hit)C.set(u,await hit[tx?"text":"arrayBuffer"]());
-  else if(await M0,M[u])C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());
-  else{for(let n=0;;n++)try{const r=await fetch(P(u),{signal:AbortSignal.timeout(tx?3e4:9e4)});if(!r.ok)throw Error(r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());break}catch(e){if(n>2)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}
+  if(hit){C.set(u,await hit[tx?"text":"arrayBuffer"]());lg("HIT",`${kd} from browser cache · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}\n    ${u}`,"r")}
+  else if(await M0,M[u]){C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());lg("BAKE",`${kd} from pre-baked ${M[u]} · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}`,"r")}
+  else{for(let n=0;;n++){const t0=performance.now(),ms=()=>Math.round(performance.now()-t0)+" ms";try{lg("TX",`GET ${u}\n    via ${PROXY||"direct"} · try ${n+1} · timeout ${tx?30:90}s`);const r=await fetch(P(u),{signal:AbortSignal.timeout(tx?3e4:9e4)});lg("RX",`HTTP ${r.status} ${r.statusText} · ${r.headers.get("content-type")||"?"} · headers in ${ms()}`,r.ok?"r":"e");if(!r.ok)throw Error("HTTP "+r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());lg("RX",`${kd} body ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"} complete in ${ms()}`,"r");break}catch(e){lg("ERR",`${e.message||e.name} after ${ms()}${n>2?" · giving up":" · retrying"}`,"e");if(n>2)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}}
     ch&&ch.put(u,new Response(tx?C.get(u):C.get(u).slice(0),{headers:{"x-t":Date.now()}})).catch(()=>0)}
   if(C.size>250)C.delete(C.keys().next().value)})().finally(()=>FL.delete(u));FL.set(u,p)}
-  await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}
+  await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}else lg("MEM",`${kd} from memory\n    ${u}`,"r");
   if(sg.aborted)throw AE();return C.get(u)};
 const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=12,sk=()=>document.body.dataset.tab=="sk";
 // spectrum mode: instead of an even spread, take the exposures nearest a wavelength ladder that is dense around the H2O / CO2 / CO ice bands
@@ -254,7 +257,7 @@ async function load(n,ra,dec,z=.25,keep){
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
   V={n,ra,dec,z};$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
-  st("Finding SPHEREx scans…");
+  lg("CMD",`load "${n}" · RA ${ra} · DEC ${dec} · FOV ${z}° · mode ${wm?"spectrum":bl?"blink":"pick"}${keep?" (reload)":""}`);st("Finding SPHEREx scans…");
   try{
     const x=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,keep!=1),"text/xml"),
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),wx=f.indexOf("em_max"),
@@ -262,7 +265,7 @@ async function load(n,ra,dec,z=.25,keep){
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
     $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
-    W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
+    lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
     const res=Array(S.length);let nx=0,dn=0;st(`Loading images 0 of ${S.length}…`);
     const one=async j=>{
       const r=S[j],B=$("tl").children[j];B.classList.add("cur");
@@ -272,8 +275,8 @@ async function load(n,ra,dec,z=.25,keep){
         cu=fl?f:F[k];res[j]=f;F=res.filter(Boolean);
         [...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
         B.className="tk";B.title=`${f.d} · ${f.w} µm`;
-        ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
-      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";B.title="Failed"}
+        lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
+      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
       st(`Loading images ${++dn} of ${S.length}…`);
     };
     await Promise.all(S.map((_,j)=>one(j)));
@@ -457,7 +460,7 @@ function hud(){
   tape(w/2,w>1000?76:140,Math.min(500,w-40),0,V.ra,s*d*Math.cos(V.dec*Math.PI/180)/D,1);
   w>1000&&tape(w-30,h/2-20,Math.min(420,h-340),1,V.dec,-s*a/D,0)
 }
-const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="DISP "+n.toUpperCase();spec()};$("pal").onclick=pal;$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;
+const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="DISP "+n.toUpperCase();spec()};$("pal").onclick=pal;$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=innerWidth<1000;
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
 const mv=()=>{dirty=performance.now();co();sc();spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
