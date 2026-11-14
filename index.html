@@ -27,7 +27,7 @@ body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .ui{position:fixed;z-index:2}
 #hd{inset:0;width:100%;height:100%;pointer-events:none}
 #fx{inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7) 100%),repeating-linear-gradient(0deg,rgba(0,0,0,.17) 0 1px,transparent 1px 3px)}
-.hud{position:fixed;left:50%;top:50%;width:128px;height:128px;margin:-64px;color:var(--a);pointer-events:none}
+.hud{position:fixed;z-index:2;left:50%;top:50%;width:128px;height:128px;margin:-64px;color:var(--a);pointer-events:none}
 .pnl{background:linear-gradient(var(--a),var(--a)) 0 0/16px 2px,linear-gradient(var(--a),var(--a)) 0 0/2px 16px,linear-gradient(var(--a),var(--a)) 100% 0/16px 2px,linear-gradient(var(--a),var(--a)) 100% 0/2px 16px,linear-gradient(var(--a),var(--a)) 0 100%/16px 2px,linear-gradient(var(--a),var(--a)) 0 100%/2px 16px,linear-gradient(var(--a),var(--a)) 100% 100%/16px 2px,linear-gradient(var(--a),var(--a)) 100% 100%/2px 16px,rgba(3,4,3,.62);background-repeat:no-repeat;box-shadow:inset 0 0 0 1px var(--ln);backdrop-filter:blur(3px)}
 .pnl h2{position:absolute;left:14px;top:-9px;padding:0 12px 0 8px;background:var(--a);color:#000;font:700 11px/16px var(--disp);letter-spacing:.24em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 .pb{padding:18px 14px 12px}
@@ -81,8 +81,16 @@ kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color
 #s.err{color:var(--er);border-left-color:var(--er)}
 #ak{position:fixed;inset:0;z-index:1;display:none;background:#000}
 body[data-tab=sk] #ak{display:block}
-body[data-tab=sk] #c,body[data-tab=sk] #hd,body[data-tab=sk] .hud,body[data-tab=sk] .ctl{visibility:hidden}
+body[data-tab=sk] #c,body[data-tab=sk] #hd,body[data-tab=sk] .ctl{visibility:hidden}
 body[data-tab=sk] #sp,body[data-tab=sk] #ob{display:none}
+#ak canvas{transition:filter .25s}
+body[data-p=amb] #ak canvas{filter:sepia(1) saturate(3.2) hue-rotate(-8deg) brightness(1.1)}
+body[data-p=grn] #ak canvas{filter:sepia(1) saturate(3.2) hue-rotate(78deg) brightness(1.1)}
+body[data-p=cyn] #ak canvas{filter:sepia(1) saturate(3.2) hue-rotate(138deg) brightness(1.1)}
+body[data-p=mono] #ak canvas{filter:grayscale(1)}
+#ak .aladin-location,#ak .aladin-fov,#ak .aladin-projection-control,#ak .aladin-status-bar,#ak .aladin-stack-control,#ak .aladin-frame{display:none!important}
+#sr{display:none;left:50%;bottom:34px;transform:translateX(-50%);padding:8px 18px;font:600 12px var(--disp);letter-spacing:.2em;color:var(--a);white-space:nowrap;pointer-events:none}
+body[data-tab=sk] #sr{display:block}
 .wr .bt{display:flex;gap:6px}
 .ih{font:700 13px var(--disp);letter-spacing:.14em;margin:12px 0 6px;color:var(--lb)}
 .ih.hit{color:var(--a);text-shadow:0 0 12px color-mix(in srgb,var(--a) 55%,transparent)}
@@ -108,6 +116,7 @@ body[data-tab=sk] #sp,body[data-tab=sk] #ob{display:none}
 <canvas id="hd" class="ui"></canvas>
 <svg class="hud" viewBox="-64 -64 128 128" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M-30-14V-30H-14M14-30H30V-14M30 14V30H14M-14 30H-30V14" stroke-width="2.2"/><path d="M0-62V-40M0 40V62M-62 0H-40M40 0H62" stroke-opacity=".7"/><path d="M-8 0h5M3 0h5M0-8v5M0 3v5"/><path d="M-52-3v6M-46-2v4M52-3v6M46-2v4M-3-52h6M-2-46h4M-3 52h6M-2 46h4" stroke-opacity=".6"/></svg>
 <div id="s">Select a target</div>
+<div id="sr" class="ui pnl">SKY MAP · CLICK ANYWHERE TO LOAD SPHEREx</div>
 <div class="ui brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
 <div class="ui tabs" id="tb"><button class="on" data-t="t">Target</button><button data-t="sp">Spectrum</button><button data-t="ob">Readout</button><button data-t="sk">Sky</button></div>
 <div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="pal" title="Display palette (C)">DISP AMB</button>
@@ -340,8 +349,8 @@ const aladin=()=>alp||(alp=(async()=>{
   let up=0;for(const u of U){try{await ld(u);up=1;break}catch{const h=new URL(u).hostname;bad.includes(h)||bad.push(h)}}
   if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
   await A.init;
-  al=A.aladin("#ak",{survey:"https://skies.esac.esa.int/DSSColor/",fov:60,showReticle:true,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
-  al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});return al})().catch(e=>{alp=0;throw e})),
+  al=A.aladin("#ak",{survey:"https://skies.esac.esa.int/DSSColor/",fov:60,showReticle:false,showFrame:false,showCooLocation:false,showFov:false,showProjectionControl:false,showStatusBar:false,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
+  al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});$("ak").addEventListener("pointermove",e=>{try{const b=$("ak").getBoundingClientRect(),c=al.pix2world(e.clientX-b.left,e.clientY-b.top);$("sr").textContent=c?`${hms(c[0])}  ${dms(c[1])} · CLICK TO LOAD SPHEREx`:"CLICK ANYWHERE TO LOAD SPHEREx"}catch{}});return al})().catch(e=>{alp=0;throw e})),
 skypick=(ra,dec)=>{if(!Number.isFinite(ra)||!Number.isFinite(dec))return;ra=+(((ra%360)+360)%360).toFixed(4);dec=+Math.max(-89.9,Math.min(89.9,dec)).toFixed(4);load(`SKY ${ra.toFixed(2)} ${dec>0?"+":""}${dec.toFixed(2)}`,ra,dec)},
 gosk=async()=>{tab("sk");
   if(fb&&$("ak").contains(fb)){sky2();return}
