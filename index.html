@@ -178,21 +178,19 @@ async function load(n,ra,dec,z=.25,keep){
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
-    const S=Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))]);let done=0;
-    await Promise.all(S.map(async(r,j)=>{
+    const S=Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))]),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",t0=+S[0][t],t1=+S[S.length-1][t];
+    W={ra,dec,z};$("t0").textContent=iso(t0);$("t1").textContent=iso(t1);
+    for(let j=0;j<S.length;j++){
+      const r=S[j];st(`Loading image ${j+1} of ${S.length}…`);
       try{
-        const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=${z}`),{signal:sg})).arrayBuffer(),
-        m=+r[t];
-        F[j]={...(i=>({c:paint(i),m:i.m}))(fits(b)),t:m,d:m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",w:+r[w]?(r[w]*1e6).toFixed(2):""};
+        const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=${z}`),{signal:sg})).arrayBuffer();if(sg.aborted)return;
+        const q=fits(b),m=+r[t],f={c:paint(q),m:q.m,t:m,d:iso(m),w:+r[w]?(r[w]*1e6).toFixed(2):""};
+        $("tl").insertAdjacentHTML("beforeend",`<button class="tk" data-j="${F.push(f)-1}" title="${f.d} · ${f.w} µm" style="left:calc(8px + (100% - 16px)*${t1>t0?(m-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+f.w||1))-.75)/4.25*14}px"><i></i></button>`);
+        ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(F.length>1?k:0);
       }catch(e){if(e.name=="AbortError")throw e}
-      st(`Loading images ${++done} of ${S.length}…`);
-    }));
-    F=F.filter(Boolean);
+    }
     if(!F.length)return st("No usable images came back from IRSA",1);
-    st("");
-    const t0=F[0].t,t1=F[F.length-1].t;$("tl").innerHTML=F.map((f,j)=>`<button class="tk" data-j="${j}" title="${f.d} · ${f.w} µm" style="left:calc(8px + (100% - 16px)*${t1>t0?(f.t-t0)/(t1-t0):j/Math.max(F.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+f.w||1))-.75)/4.25*14}px"><i></i></button>`).join("");$("t0").textContent=F[0].d;$("t1").textContent=F[F.length-1].d;
-    ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);
-    W={ra,dec,z};show(0);dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    st("");dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -212,7 +210,6 @@ $("pl").onclick=toggle;$("pv").onclick=()=>{stop();show(k-1)};$("nx").onclick=()
 $("tl").onclick=e=>{const b=e.target.closest(".tk");if(b){stop();show(+b.dataset.j)}};
 addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(e.key=="ArrowLeft")$("pv").click();else if(e.key=="ArrowRight")$("nx").click();else if(e.key==" "){e.preventDefault();$("pl").disabled||toggle()}});
 
-load(...T[0]);
 function sc(){const f=F[k];if(!f||!f.m||!L)return;const[a,b,c,d]=f.m,D=a*d-b*c;if(!D)return;
   const s=Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height),pp=s*L.z/V.z/(Math.sqrt(Math.abs(D))*3600),v=[10,30,60,120,300,600,1200].find(x=>x*pp>=90)||1200;
   $("sbar").style.width=v*pp+"px";$("sl").textContent=v<60?`${v}″`:`${v/60}′`;
