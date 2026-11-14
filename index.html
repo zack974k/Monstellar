@@ -82,7 +82,7 @@
 
   <div id="sky-map"></div>
 
-  <script src="https://unistra.fr" charset="utf-8"></script>
+  <script src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js" charset="utf-8"></script>
   <script>
     let map;
     let frames = [];
@@ -122,7 +122,7 @@
 
       // Clear old image layers from memory
       frames.forEach(f => {
-        try { map.removeOverlayImageLayer(f.layer); } catch (e) {}
+        try { map.removeImageLayer(f.layer.name || f.layer); } catch (e) {}
       });
       frames = [];
       flipBtn.disabled = true;
@@ -137,34 +137,31 @@
 
       try {
         // Step 1: Query NASA IRSA SIA2 endpoint for SPHEREx images at (ra, dec)
-        const siaUrl = `https://caltech.edu{ra}%20${dec}%200.02&RESPONSEFORMAT=json`;
+        const siaUrl = `https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2&POS=circle+${ra}+${dec}+0.02&MAXREC=200`;
         const response = await fetch(siaUrl, { signal: fetchController.signal });
-        const json = await response.json();
+        const xml = new DOMParser().parseFromString(await response.text(), "text/xml");
+        const fields = [...xml.getElementsByTagName("FIELD")].map(f => f.getAttribute("name"));
+        const urlIdx = fields.indexOf("access_url"), timeIdx = fields.indexOf("t_min");
+        const rows = [...xml.getElementsByTagName("TR")].map(tr => [...tr.getElementsByTagName("TD")].map(td => td.textContent.trim()));
 
-        // Parse columns and rows from IRSA JSON response
-        const fields = json.metadata.map(m => m.name);
-        const urlIdx = fields.indexOf("access_url");
-        const timeIdx = fields.indexOf("t_min");
+        const sortedRows = rows
+          .filter(r => r[urlIdx] && r[urlIdx].includes("/ibe/"))
+          .sort((a, b) => a[timeIdx] - b[timeIdx])
+          .slice(0, 10);
 
-        if (!json.data || json.data.length === 0) {
+        if (!sortedRows.length) {
           status.textContent = `No SPHEREx exposures found yet for ${label}.`;
           return;
         }
-
-        // Sort oldest to newest and keep up to 10 frames so the user's device stays fast
-        const sortedRows = json.data
-          .filter(row => row[urlIdx])
-          .sort((a, b) => a[timeIdx] - b[timeIdx])
-          .slice(0, 10);
 
         status.textContent = `Found ${sortedRows.length} SPHEREx scans. Loading cropped cutouts...`;
 
         // Step 2: Build server-side cropped cutout URLs (?center=RA,DEC&size=3arcmin)
         for (let i = 0; i < sortedRows.length; i++) {
           const rawUrl = sortedRows[i][urlIdx];
-          const mjd = sortedRows[i][timeIdx];
+          const mjd = parseFloat(sortedRows[i][timeIdx]);
           const joinChar = rawUrl.includes("?") ? "&" : "?";
-          const cutoutUrl = `${rawUrl}${joinChar}center=${ra},${dec}deg&size=3arcmin`;
+          const cutoutUrl = `${rawUrl}${joinChar}center=${ra},${dec}&size=0.05`;
 
           // Convert MJD timestamp into a readable date
           const dateStr = mjd
