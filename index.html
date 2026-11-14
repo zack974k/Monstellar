@@ -64,7 +64,7 @@ form input::placeholder{color:var(--dim)}form input:focus{border-color:var(--a)}
 <header class="ui top">
   <nav id="nav"></nav>
   <div class="tools"><form id="f"><input id="q" placeholder="RA, Dec in degrees" autocomplete="off" aria-label="RA, Dec in degrees"></form>
-  <button class="ic" id="fs" title="Fullscreen (F) · Hide interface (H) · Fit image (Z)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
+  <button class="ic" id="fs" title="Fullscreen (F) · Hide interface (H) · Fit image (Z) · Move (WASD) · Zoom (+/− or scroll)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
 </header>
 <section class="ui info">
   <div><h1 id="tt"></h1><div id="co"></div></div>
@@ -86,7 +86,8 @@ st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":""
 hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
 dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
-let F=[],k=0,tm,ac;
+let F=[],k=0,tm,ac,V,L,W,dirty;
+const co=()=>$("co").textContent=`RA ${hms(V.ra)}   Dec ${dms(V.dec)}   FOV ${+V.z.toFixed(3)}°`;
 
 // minimal FITS reader: walks the HDUs and returns the first 2D image (SPHEREx cutout: IMAGE ext)
 function fits(buf){
@@ -126,7 +127,7 @@ function paint({w,h,a}){
 
 function show(n){
   if(!F.length)return;
-  k=(n+F.length)%F.length;const f=F[k];
+  k=(n+F.length)%F.length;const f=F[k];L={...W,m:f.m};
   cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);
   $("wl").textContent=f.w?`${f.w} µm`:"";$("rd").textContent=`${f.d} · frame ${k+1} of ${F.length}`;sc();
   [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",j==k));
@@ -135,11 +136,11 @@ const stop=()=>{clearInterval(tm);tm=0;$("pl").textContent="Play"};
 const play=()=>{if(F.length<2)return;$("pl").textContent="Pause";tm=setInterval(()=>show(k+1),700)};
 const toggle=()=>tm?stop():play();
 
-async function load(n,ra,dec){
+async function load(n,ra,dec,z=.25,keep){
   stop();ac?.abort();ac=new AbortController;const sg=ac.signal;
-  F=[];cv.width=cv.height=1;ctx.clearRect(0,0,1,1);$("tl").innerHTML="";
+  F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="");$("tl").innerHTML="";
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
-  $("tt").textContent=n;$("co").textContent=`RA ${hms(ra)}   Dec ${dms(dec)}`;$("wl").textContent=$("rd").textContent=$("t0").textContent=$("t1").textContent="";
+  V={n,ra,dec,z};$("tt").textContent=n;co();$("wl").textContent=$("rd").textContent=$("t0").textContent=$("t1").textContent="";
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   st("Finding SPHEREx scans…");
   try{
@@ -150,7 +151,7 @@ async function load(n,ra,dec){
     const S=Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))]);let done=0;
     await Promise.all(S.map(async(r,j)=>{
       try{
-        const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`),{signal:sg})).arrayBuffer(),
+        const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=${z}`),{signal:sg})).arrayBuffer(),
         m=+r[t];
         F[j]={...(i=>({c:paint(i),m:i.m}))(fits(b)),t:m,d:m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",w:+r[w]?(r[w]*1e6).toFixed(2):""};
       }catch(e){if(e.name=="AbortError")throw e}
@@ -161,7 +162,7 @@ async function load(n,ra,dec){
     st("");
     const t0=F[0].t,t1=F[F.length-1].t;$("tl").innerHTML=F.map((f,j)=>`<button class="tk" data-j="${j}" title="${f.d} · ${f.w} µm" style="left:calc(8px + (100% - 16px)*${t1>t0?(f.t-t0)/(t1-t0):j/Math.max(F.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+f.w||1))-.75)/4.25*14}px"><i></i></button>`).join("");$("t0").textContent=F[0].d;$("t1").textContent=F[F.length-1].d;
     ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);
-    show(0);
+    W={ra,dec,z};show(0);dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -182,14 +183,33 @@ $("tl").onclick=e=>{const b=e.target.closest(".tk");if(b){stop();show(+b.dataset
 addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(e.key=="ArrowLeft")$("pv").click();else if(e.key=="ArrowRight")$("nx").click();else if(e.key==" "){e.preventDefault();$("pl").disabled||toggle()}});
 
 load(...T[0]);
-function sc(){const f=F[k];if(!f||!f.m)return;const[a,b,c,d]=f.m,D=a*d-b*c;if(!D)return;
-  const s=Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height),pp=s/(Math.sqrt(Math.abs(D))*3600),v=[10,30,60,120,300,600,1200].find(x=>x*pp>=90)||1200;
+function sc(){const f=F[k];if(!f||!f.m||!L)return;const[a,b,c,d]=f.m,D=a*d-b*c;if(!D)return;
+  const s=Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height),pp=s*L.z/V.z/(Math.sqrt(Math.abs(D))*3600),v=[10,30,60,120,300,600,1200].find(x=>x*pp>=90)||1200;
   $("sbar").style.width=v*pp+"px";$("sl").textContent=v<60?`${v}″`:`${v/60}′`;
   const u=([x,y])=>{const l=Math.hypot(x,y)||1;return[x/l,-y/l]};
   [["n",u([-b/D,a/D])],["e",u([d/D,-c/D])]].forEach(([i,p])=>{$("c"+i).setAttribute("x2",p[0]*28);$("c"+i).setAttribute("y2",p[1]*28);$("t"+i).setAttribute("x",p[0]*38);$("t"+i).setAttribute("y",p[1]*38)})}
 const FS=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
 $("fs").onclick=FS;$("c").onclick=()=>document.body.classList.toggle("hide");addEventListener("resize",sc);
 addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey)return;const q=e.key.toLowerCase();if(q=="h")$("c").click();else if(q=="f")FS();else if(q=="z"){document.body.classList.toggle("fit");sc()}});
+// WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
+const K=new Set,N={"+":"=",_:"-"};let lt=0;
+const mv=()=>{dirty=performance.now();co();sc()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
+addEventListener("keydown",e=>{if(e.target.tagName!="INPUT"&&!e.metaKey&&!e.ctrlKey){const q=e.key.toLowerCase();K.add(N[q]||q)}});
+addEventListener("keyup",e=>{const q=e.key.toLowerCase();K.delete(N[q]||q)});addEventListener("blur",()=>K.clear());
+addEventListener("wheel",e=>{if(V&&L&&!e.target.closest("#nav")){e.preventDefault();zm(Math.exp(e.deltaY*.0015))}},{passive:false});
+requestAnimationFrame(function tick(t){
+  const dt=Math.min(.05,(t-lt)/1e3)||0;lt=t;
+  if(V&&L){
+    const r=L.z/V.z,[a,b,c,d]=L.m,D=a*d-b*c||1,x=K.has("d")-K.has("a"),y=K.has("s")-K.has("w"),zi=K.has("=")-K.has("-");
+    if(x||y){const n=.4*cv.width*dt/r/Math.hypot(x,y);
+      V.ra=(V.ra+(a*x-b*y)*n/Math.cos(V.dec*Math.PI/180)+360)%360;V.dec=Math.max(-89.9,Math.min(89.9,V.dec+(c*x-d*y)*n));mv()}
+    if(zi)zm(Math.exp(-zi*1.5*dt));
+    const s=Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height)*L.z/V.z,u=((V.ra-L.ra+540)%360-180)*Math.cos(L.dec*Math.PI/180),w=V.dec-L.dec;
+    cv.style.transform=`translate(${-(d*u-b*w)/D*s}px,${(a*w-c*u)/D*s}px) scale(${L.z/V.z})`;
+  }
+  if(dirty&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
+  requestAnimationFrame(tick)
+});
 load(...T[0]);
 </script>
 </body>
