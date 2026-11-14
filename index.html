@@ -26,7 +26,7 @@ body.fit #c{object-fit:contain}
 body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .ui{position:fixed;z-index:2}
 #hd{inset:0;width:100%;height:100%;pointer-events:none}
-#fx{inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7) 100%),repeating-linear-gradient(0deg,rgba(0,0,0,.17) 0 1px,transparent 1px 3px)}
+#fx{inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle 280px at var(--mx,50%) var(--my,50%),color-mix(in srgb,var(--a) 10%,transparent),transparent),radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.7) 100%),repeating-linear-gradient(0deg,rgba(0,0,0,.17) 0 1px,transparent 1px 3px)}
 .hud{position:fixed;z-index:2;left:50%;top:50%;width:128px;height:128px;margin:-64px;color:var(--a);pointer-events:none}
 .pnl{background:linear-gradient(var(--a),var(--a)) 0 0/16px 2px,linear-gradient(var(--a),var(--a)) 0 0/2px 16px,linear-gradient(var(--a),var(--a)) 100% 0/16px 2px,linear-gradient(var(--a),var(--a)) 100% 0/2px 16px,linear-gradient(var(--a),var(--a)) 0 100%/16px 2px,linear-gradient(var(--a),var(--a)) 0 100%/2px 16px,linear-gradient(var(--a),var(--a)) 100% 100%/16px 2px,linear-gradient(var(--a),var(--a)) 100% 100%/2px 16px,rgba(3,4,3,.62);background-repeat:no-repeat;box-shadow:inset 0 0 0 1px var(--ln);backdrop-filter:blur(3px)}
 .pnl h2{position:absolute;left:14px;top:-9px;padding:0 12px 0 8px;background:var(--a);color:#000;font:700 11px/16px var(--disp);letter-spacing:.24em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 6px) 100%,0 100%)}
@@ -35,7 +35,7 @@ body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .brand b{display:block;font:700 22px/1 var(--disp);letter-spacing:.32em}.brand span{font:600 10px var(--disp);letter-spacing:.24em;text-transform:uppercase;color:var(--lb)}
 .tools{right:16px;top:12px;display:flex;align-items:center;gap:14px}
 .lk{display:flex;align-items:center;gap:8px;font:600 11px var(--disp);letter-spacing:.22em;color:var(--a);white-space:nowrap}
-.lk::before{content:"";width:8px;height:8px;background:currentColor}
+.lk::before{content:"";width:8px;height:8px;background:currentColor;animation:pu 2s ease-in-out infinite}
 .lk.busy::before{animation:bl .8s steps(2) infinite}.lk.err{color:var(--er)}
 @keyframes bl{50%{opacity:.1}}
 #utc{font-size:12px;color:var(--lb);white-space:nowrap}
@@ -46,7 +46,7 @@ body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .tabs{left:50%;top:10px;transform:translateX(-50%);display:flex;gap:2px}.tabs button{height:26px;padding:0 18px;font:700 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-bottom:2px solid transparent}.tabs button:hover{background:color-mix(in srgb,var(--a) 18%,transparent);color:var(--ink)}.tabs button.on{background:var(--a);color:#000}
 body[data-tab=t] #sp,body[data-tab=t] #ob,body[data-tab=sp] #gt,body[data-tab=sp] #ob,body[data-tab=ob] #gt,body[data-tab=ob] #sp{display:none}
 #nav{display:flex;flex-direction:column;gap:2px}
-#nav button{height:30px;display:flex;align-items:center;gap:12px;padding:0 12px;text-align:left;font:600 13px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:background .15s}
+#nav button{height:30px;display:flex;align-items:center;gap:12px;padding:0 12px;text-align:left;font:600 13px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:background .15s,transform .15s}
 #nav button span{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#nav button small{display:none}
 #nav button:hover{background:color-mix(in srgb,var(--a) 18%,transparent)}
 #nav button.on{background:var(--a);color:#000;border-left-color:var(--a)}#nav button.on span{color:#000}
@@ -89,6 +89,15 @@ body[data-p=grn] #ak canvas{filter:sepia(1) saturate(3.2) hue-rotate(78deg) brig
 body[data-p=cyn] #ak canvas{filter:sepia(1) saturate(3.2) hue-rotate(138deg) brightness(1.1)}
 body[data-p=mono] #ak canvas{filter:grayscale(1)}
 #ak .aladin-location,#ak .aladin-fov,#ak .aladin-projection-control,#ak .aladin-status-bar,#ak .aladin-stack-control,#ak .aladin-frame{display:none!important}
+#bk:hover,.ctl>button.on{background:var(--a);color:#000}
+#bl{display:none;left:50%;bottom:92px;transform:translateX(-50%);padding:6px 16px;font:700 13px var(--disp);letter-spacing:.2em;color:var(--a);white-space:nowrap;pointer-events:none}
+body.blk:not([data-tab=sk]) #bl{display:block}
+#lmp{right:16px;top:52px;width:320px;font-size:12px;line-height:1.45}
+#pg{width:0;height:0;pointer-events:none}
+#pg::before,#pg::after{content:"";position:absolute;width:56px;height:56px;border:1.5px solid var(--a);opacity:0;transform:translate(-50%,-50%) scale(.2)}
+#pg::after{border-radius:50%}
+#pg.on::before{animation:pg .7s ease-out}#pg.on::after{animation:pg 1s .1s ease-out}
+@keyframes pg{0%{opacity:1;transform:translate(-50%,-50%) scale(.2)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.6)}}
 #sr{display:none;left:50%;bottom:34px;transform:translateX(-50%);padding:8px 18px;font:600 12px var(--disp);letter-spacing:.2em;color:var(--a);white-space:nowrap;pointer-events:none}
 body[data-tab=sk] #sr{display:block}
 .wr .bt{display:flex;gap:6px}
@@ -100,6 +109,19 @@ body[data-tab=sk] #sr{display:block}
 .ir.yes span{color:var(--a)}.ir.em span{color:var(--er)}
 .ir small{grid-column:1/-1;font-size:11px;color:var(--lb)}
 .in{margin-top:8px;font-size:10px;line-height:1.35;color:var(--lb);opacity:.8}
+/* motion */
+.ui{animation:boot .8s backwards}
+.brand{animation-delay:.05s}.tabs{animation-delay:.15s}.tools{animation-delay:.25s}.ctl{animation-delay:.5s}.keys{animation-delay:.7s}
+@keyframes boot{from{opacity:0;filter:blur(8px) brightness(2.5)}}
+#lc>*,#nav button{animation:slide .5s cubic-bezier(.2,.8,.2,1) backwards}
+#lc>#gt{animation-delay:.3s}#nav button{animation-delay:calc(.3s + var(--i,0)*45ms)}
+@keyframes slide{from{opacity:0;transform:translateX(-22px)}}
+#nav button:hover{transform:translateX(5px)}
+#fx::after{content:"";position:absolute;left:0;right:0;top:0;height:140px;background:linear-gradient(transparent,color-mix(in srgb,var(--a) 7%,transparent),transparent);animation:sw 7s linear infinite}
+@keyframes sw{from{transform:translateY(-140px)}to{transform:translateY(100vh)}}
+@keyframes pu{50%{opacity:.3}}
+#c.fl{animation:fl .3s ease-out}@keyframes fl{from{opacity:.35}}
+@media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important}}
 @media(max-width:1000px){
   .brand span,#utc,.keys{display:none}.brand b{font-size:14px;letter-spacing:.2em}.lk{font-size:0}.tools{gap:8px}
   .tabs{left:10px;top:42px;transform:none}#lc{top:80px;left:10px;right:10px;width:auto}#gt{gap:10px}#nav{flex-direction:row;overflow:auto;scrollbar-width:none}#nav button{flex:none;padding:0 12px}
@@ -116,10 +138,13 @@ body[data-tab=sk] #sr{display:block}
 <canvas id="hd" class="ui"></canvas>
 <svg class="hud" viewBox="-64 -64 128 128" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M-30-14V-30H-14M14-30H30V-14M30 14V30H14M-14 30H-30V14" stroke-width="2.2"/><path d="M0-62V-40M0 40V62M-62 0H-40M40 0H62" stroke-opacity=".7"/><path d="M-8 0h5M3 0h5M0-8v5M0 3v5"/><path d="M-52-3v6M-46-2v4M52-3v6M46-2v4M-3-52h6M-2-46h4M-3 52h6M-2 46h4" stroke-opacity=".6"/></svg>
 <div id="s">Select a target</div>
+<div id="pg" class="ui"></div>
+<div id="bl" class="ui pnl"></div>
+<div id="lmp" class="ui pnl" hidden><h2>Limits</h2><div class="pb">Exploration tool, not a detection. SPHEREx frames from different dates also differ in wavelength, so a brightness change alone is not proof of motion: Blink only pairs frames within 0.05 µm, more than 1 h apart. The ice readout is a quick look (3×3 median minus field median, 3σ), not a calibrated product. Data: NASA/IPAC IRSA, SPHEREx QR3.</div></div>
 <div id="sr" class="ui pnl">SKY MAP · CLICK ANYWHERE TO LOAD SPHEREx</div>
 <div class="ui brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
 <div class="ui tabs" id="tb"><button class="on" data-t="t">Target</button><button data-t="sp">Spectrum</button><button data-t="ob">Readout</button><button data-t="sk">Sky</button></div>
-<div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="pal" title="Display palette (C)">DISP AMB</button>
+<div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Display palette (C)">DISP AMB</button>
   <button class="ic" id="fs" title="Fullscreen (F) · Hide interface (H) · Fit image (Z) · Move (WASD) · Zoom (+/− or scroll) · Drag/pinch · Speed ([ ]) · Wavelength order (M)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
 <div id="lc" class="ui">
 <div id="gt">
@@ -136,10 +161,10 @@ body[data-tab=sk] #sr{display:block}
 
 
 <footer class="ui pnl ctl">
-  <button id="pv" disabled aria-label="Previous frame">‹</button><button id="pl" disabled>Play</button><button id="nx" disabled aria-label="Next frame">›</button>
+  <button id="pv" disabled aria-label="Previous frame">‹</button><button id="pl" disabled>Play</button><button id="nx" disabled aria-label="Next frame">›</button><button id="bk" title="Blink same-wavelength frames across dates (B)">Blink</button>
   <span id="t0"></span><div id="tl"></div><span id="t1"></span>
 </footer>
-<div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>P</kbd>Spectrum</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>Tabs</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
+<div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>P</kbd>Spectrum</span><span><kbd>B</kbd>Blink</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>Tabs</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
 <script>
 // GitHub Pages caches HTML ~10 min: re-fetch self uncached; if the ETag changed, reload onto the fresh copy
 setTimeout(()=>fetch(location.href,{cache:"reload"}).then(r=>{const e=r.headers.get("etag"),o=localStorage.e;if(e){localStorage.e=e;o&&o!=e&&location.reload()}}).catch(()=>{}),4000);
@@ -154,7 +179,7 @@ st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":""
 hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
 dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
-let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,sp=700;
+let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,sp=700;
 const C=new Map,G=async(u,sg,tx,pc)=>{if(!C.has(u)){
   const ch=pc&&window.caches?await caches.open("mst1").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
   if(hit&&tx&&Date.now()-hit.headers.get("x-t")>216e5)hit=0;
@@ -166,6 +191,8 @@ const SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&PO
 // spectrum mode: instead of an even spread, take the exposures nearest a wavelength ladder that is dense around the H2O / CO2 / CO ice bands
 const LAD=[.8,1.2,1.6,2,2.4,2.6,2.7,2.8,2.9,3,3.1,3.2,3.35,3.6,3.75,4.05,4.15,4.22,4.27,4.32,4.4,4.5,4.58,4.64,4.67,4.7,4.8,4.9],
 ladder=(R,w,wx)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6,used=new Set,o=[];for(const l of LAD){let b=-1,bd=1e9;R.forEach((r,i)=>{const d=Math.abs(m(r)-l);if(!used.has(i)&&d<bd){bd=d;b=i}});if(b>=0&&bd<.06){used.add(b);o.push(R[b])}}return o.length>1?o:R.slice(0,12)};
+// BLINK: frames of ~the same wavelength taken on different dates (>1 h apart), so what changes is the sky, not the band
+const blink=(R,w,wx,t)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6;let best=[];for(const a of R){const c=[];R.forEach(b=>{Math.abs(m(a)-m(b))<.05&&c.every(x=>Math.abs(x[t]-b[t])>.04)&&c.push(b)});c.length>best.length&&(best=c)}return best.sort((a,b)=>a[t]-b[t]).slice(0,10)};
 const co=()=>{$("ra").textContent=hms(V.ra);$("de").textContent=dms(V.dec);$("fv").textContent=`${V.z.toFixed(3)}° (${(V.z*60).toFixed(1)}′)`};
 
 // minimal FITS reader: walks the HDUs and returns the first 2D image (SPHEREx cutout: IMAGE ext)
@@ -207,19 +234,22 @@ function paint({w,h,a}){
 function show(n){
   if(!F.length)return;
   k=(n+F.length)%F.length;const f=F[k];L={...W,m:f.m};
-  cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);
-  $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`;sc();spec();
+  cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);if(!bl&&k!=pk){pk=k;cv.classList.remove("fl");void cv.offsetWidth;cv.classList.add("fl")}
+  $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`;sc();spec();bl&&($("bl").textContent=`BLINK · ${f.d}Z · ${f.w} µm · ${p2(k+1)}/${p2(F.length)}`);
   [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",b.dataset.j==k));
 }
 const stop=()=>{fl=0;clearInterval(tm);tm=0;$("pl").textContent="Play"};
 const play=()=>{if(F.length<2)return;fl=0;$("pl").textContent="Pause";tm=setInterval(()=>show(k+1),sp)};
-const toggle=()=>tm?stop():play();
+const scr=(e,t)=>{let i=0;clearInterval(e.sc);e.sc=setInterval(()=>{e.textContent=[...t].map((c,j)=>j<i||c==" "?c:"█▓▒░#%$&"[Math.random()*9|0]).join("");(i+=1.2)>=t.length&&(clearInterval(e.sc),e.textContent=t)},28)},
+toggle=()=>tm?stop():play(),
+nb=()=>{bl=0;sp=700;$("bk").classList.remove("on");document.body.classList.remove("blk")},
+bk=()=>{bl=!bl;if(bl){wm=0;sp=450;tab("t");$("bk").classList.add("on");document.body.classList.add("blk")}else nb();V&&load(V.n,V.ra,V.dec,V.z,2)};
 
 async function load(n,ra,dec,z=.25,keep){
   !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();ac=new AbortController;const sg=ac.signal;bz=1;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
-  V={n,ra,dec,z};$("tt").textContent=n;co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
+  V={n,ra,dec,z};scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   st("Finding SPHEREx scans…");
   try{
@@ -227,7 +257,7 @@ async function load(n,ra,dec,z=.25,keep){
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),wx=f.indexOf("em_max"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[wm?w:t]-b[wm?w:t]);
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
-    const S=(wm?ladder(R,w,wx):Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))])),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
+    const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):Array.from({length:Math.min(12,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(12,R.length)-1,1))])),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
     $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
     W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
     const res=Array(S.length);let nx=0,dn=0;st(`Loading images 0 of ${S.length}…`);
@@ -245,7 +275,7 @@ async function load(n,ra,dec,z=.25,keep){
     };
     await Promise.all(Array.from({length:Math.min(CONC,S.length)},async()=>{while(nx<S.length)await one(nx++)}));
     if(!F.length)return st("No usable images came back from IRSA",1);
-    st("");dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    st("");bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -253,7 +283,7 @@ async function load(n,ra,dec,z=.25,keep){
   }finally{if(sg==ac.signal)bz=0}
 }
 
-T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=n;b.title=`RA ${ra}° Dec ${dec}°`;b.innerHTML=`${p2(i+1)}<span>${n}</span><small>${ra}° ${dec>0?"+":""}${dec}°</small>`;b.onclick=()=>load(n,ra,dec);b.onpointerenter=()=>warm(ra,dec);$("nav").append(b)});
+T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=n;b.style.setProperty("--i",i);b.title=`RA ${ra}° Dec ${dec}°`;b.innerHTML=`${p2(i+1)}<span>${n}</span><small>${ra}° ${dec>0?"+":""}${dec}°</small>`;b.onclick=()=>load(n,ra,dec);b.onpointerenter=()=>warm(ra,dec);$("nav").append(b)});
 
 $("f").onsubmit=async e=>{
   e.preventDefault();
@@ -273,7 +303,7 @@ function sc(){const f=F[k];if(!f||!f.m||!L)return;const[a,b,c,d]=f.m,D=a*d-b*c;i
   [["n",u([-b/D,a/D])],["e",u([d/D,-c/D])]].forEach(([i,p])=>{$("c"+i).setAttribute("x2",p[0]*28);$("c"+i).setAttribute("y2",p[1]*28);$("t"+i).setAttribute("x",p[0]*38);$("t"+i).setAttribute("y",p[1]*38)})}
 const FS=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
 $("fs").onclick=FS;$("c").onclick=()=>dg?dg=0:document.body.classList.toggle("hide");addEventListener("resize",sc);
-addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey)return;const q=e.key.toLowerCase();if(q=="h")$("c").click();else if(q=="f")FS();else if(q=="z"){document.body.classList.toggle("fit");sc()}else if(q=="c")pal();else if(q=="[")sp=Math.min(2e3,sp*1.4),tm&&(stop(),play());else if(q=="]")sp=Math.max(150,sp/1.4),tm&&(stop(),play());else if(q=="m"){wm=!wm;V&&load(V.n,V.ra,V.dec,V.z,2)}else if(q=="p")tsp();else if(q=="1")tab("t");else if(q=="2")gosp();else if(q=="3")tab("ob");else if(q=="4")gosk()});
+addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey)return;const q=e.key.toLowerCase();if(q=="h")$("c").click();else if(q=="f")FS();else if(q=="z"){document.body.classList.toggle("fit");sc()}else if(q=="c")pal();else if(q=="[")sp=Math.min(2e3,sp*1.4),tm&&(stop(),play());else if(q=="]")sp=Math.max(150,sp/1.4),tm&&(stop(),play());else if(q=="m"){wm=!wm;nb();V&&load(V.n,V.ra,V.dec,V.z,2)}else if(q=="p")tsp();else if(q=="b")bk();else if(q=="1")tab("t");else if(q=="2")gosp();else if(q=="3")tab("ob");else if(q=="4")gosk()});
 // SPECTRUM: sample every loaded frame at the crosshair (view centre) (own WCS per frame), 3x3 median, plot vs wavelength
 const sm=(f,p)=>{const[a,b,c,d]=f.m,D=a*d-b*c;if(!D||!f.cr)return NaN;const[x0,y0,r0,d0]=f.cr,xi=((p.ra-r0+540)%360-180)*Math.cos(d0*Math.PI/180),et=p.dec-d0,
   ix=Math.round(x0-1+(d*xi-b*et)/D),iy=Math.round(y0-1+(a*et-c*xi)/D),w=f.n,h=f.a.length/w;if(ix<1||iy<1||ix>w-2||iy>h-2)return NaN;
@@ -339,9 +369,9 @@ function spec(){
   $("sx").textContent=`${pt.length} BANDS`+(cur?` · ${cur.x.toFixed(2)} µm = ${cur.y.toPrecision(3)}`:"");
 }
 const tab=t=>{document.body.dataset.tab=t;[...$("tb").children].forEach(b=>b.classList.toggle("on",b.dataset.t==t));spec()},
-gosp=()=>{tab("sp");if(!wm&&V){wm=1;load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>document.body.dataset.tab=="sp"?tab("t"):gosp();
+gosp=()=>{tab("sp");if(!wm&&V){wm=1;nb();load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>document.body.dataset.tab=="sp"?tab("t"):gosp();
 // SKY: Aladin Lite all-sky map (WISE infrared), loaded on first use. Click anywhere -> SPHEREx cutouts + spectrum + ice scan for that spot
-let al,alp;
+let al,alp,pp=[0,0];const ping=()=>{const p=$("pg");p.style.left=pp[0]+"px";p.style.top=pp[1]+"px";p.classList.remove("on");void p.offsetWidth;p.classList.add("on")};
 const aladin=()=>alp||(alp=(async()=>{
   // Aladin Lite v3 on jsDelivr is an ES module: load it with import() (a classic <script> throws "Unexpected token 'export'")
   const U=["https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js"],bad=[],
@@ -350,7 +380,7 @@ const aladin=()=>alp||(alp=(async()=>{
   if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
   await A.init;
   al=A.aladin("#ak",{survey:"https://skies.esac.esa.int/DSSColor/",fov:60,showReticle:false,showFrame:false,showCooLocation:false,showFov:false,showProjectionControl:false,showStatusBar:false,showZoomControl:false,showFullscreenControl:false,showLayersControl:false,showGotoControl:false,showShareControl:false,showSimbadPointerControl:false,showCooGridControl:false,showSettingsControl:false,showContextMenu:false});
-  al.on("click",e=>{e&&!e.isDragging&&skypick(e.ra,e.dec)});$("ak").addEventListener("pointermove",e=>{try{const b=$("ak").getBoundingClientRect(),c=al.pix2world(e.clientX-b.left,e.clientY-b.top);$("sr").textContent=c?`${hms(c[0])}  ${dms(c[1])} · CLICK TO LOAD SPHEREx`:"CLICK ANYWHERE TO LOAD SPHEREx"}catch{}});return al})().catch(e=>{alp=0;throw e})),
+  al.on("click",e=>{e&&!e.isDragging&&(ping(),skypick(e.ra,e.dec))});$("ak").addEventListener("contextmenu",e=>{e.preventDefault();e.stopPropagation()},true);$("ak").addEventListener("pointerdown",e=>pp=[e.clientX,e.clientY]);$("ak").addEventListener("pointermove",e=>{pp=[e.clientX,e.clientY];try{const b=$("ak").getBoundingClientRect(),c=al.pix2world(e.clientX-b.left,e.clientY-b.top);$("sr").textContent=c?`${hms(c[0])}  ${dms(c[1])} · CLICK TO LOAD SPHEREx`:"CLICK ANYWHERE TO LOAD SPHEREx"}catch{}});return al})().catch(e=>{alp=0;throw e})),
 skypick=(ra,dec)=>{if(!Number.isFinite(ra)||!Number.isFinite(dec))return;ra=+(((ra%360)+360)%360).toFixed(4);dec=+Math.max(-89.9,Math.min(89.9,dec)).toFixed(4);load(`SKY ${ra.toFixed(2)} ${dec>0?"+":""}${dec.toFixed(2)}`,ra,dec)},
 gosk=async()=>{tab("sk");
   if(fb&&$("ak").contains(fb)){sky2();return}
@@ -391,7 +421,7 @@ skyfb=why=>{
   const box=$("ak");
   if(!fb||!box.contains(fb)){box.innerHTML="";fb=document.createElement("canvas");fb.style.cssText="position:absolute;inset:0;width:100%;height:100%;cursor:crosshair";box.append(fb);
     fb.onmousemove=e=>{fm=[e.clientX,e.clientY];sky2()};fb.onmouseleave=()=>{fm=0;sky2()};
-    fb.onclick=e=>{const m=skyxy(e.clientX,e.clientY);m&&skypick(m[0],m[1])}}
+    fb.onclick=e=>{const m=skyxy(e.clientX,e.clientY);m&&(pp=[e.clientX,e.clientY],ping(),skypick(m[0],m[1]))}}
   fr=why;sky2()};
 addEventListener("resize",sky2);
 $("tb").onclick=e=>{const b=e.target.closest("button");b&&(b.dataset.t=="sp"?gosp():b.dataset.t=="sk"?gosk():tab(b.dataset.t))};
@@ -424,7 +454,7 @@ function hud(){
   tape(w/2,w>1000?76:140,Math.min(500,w-40),0,V.ra,s*d*Math.cos(V.dec*Math.PI/180)/D,1);
   w>1000&&tape(w-30,h/2-20,Math.min(420,h-340),1,V.dec,-s*a/D,0)
 }
-const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="DISP "+n.toUpperCase();spec()};$("pal").onclick=pal;
+const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="DISP "+n.toUpperCase();spec()};$("pal").onclick=pal;$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
 const mv=()=>{dirty=performance.now();co();sc();spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
@@ -453,6 +483,7 @@ requestAnimationFrame(function tick(t){
   if(dirty&&!bz&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
   requestAnimationFrame(tick)
 });
+addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
 load(...T[0]).then(()=>T.slice(1).forEach(([,r,d],i)=>setTimeout(()=>warm(r,d),i*400)));
 </script>
