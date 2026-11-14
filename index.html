@@ -150,7 +150,7 @@ const C=new Map,G=async(u,sg,tx,pc)=>{if(!C.has(u)){
   const ch=pc&&window.caches?await caches.open("mst1").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
   if(hit&&tx&&Date.now()-hit.headers.get("x-t")>216e5)hit=0;
   if(hit)C.set(u,await hit[tx?"text":"arrayBuffer"]());
-  else{for(let n=0;;n++)try{const r=await fetch(P(u),{signal:AbortSignal.any([sg,AbortSignal.timeout(15e3)])});if(!r.ok)throw Error(r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());break}catch(e){if(sg.aborted||n)throw e}
+  else{for(let n=0;;n++)try{const r=await fetch(P(u),{signal:AbortSignal.any([sg,AbortSignal.timeout(8e3)])});if(!r.ok)throw Error(r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());break}catch(e){if(sg.aborted||n>1)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}
     ch&&ch.put(u,new Response(tx?C.get(u):C.get(u).slice(0),{headers:{"x-t":Date.now()}})).catch(()=>0)}
   if(C.size>80)C.delete(C.keys().next().value)}return C.get(u)};
 const SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=6,sk=()=>document.body.dataset.tab=="sk";
@@ -334,9 +334,9 @@ gosp=()=>{tab("sp");if(!wm&&V){wm=1;load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>documen
 // SKY: Aladin Lite all-sky map (WISE infrared), loaded on first use. Click anywhere -> SPHEREx cutouts + spectrum + ice scan for that spot
 let al,alp;
 const aladin=()=>alp||(alp=(async()=>{
-  // try several hosts for the library: some networks block one of them
-  const U=["https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js","https://aladin.u-strasbg.fr/AladinLite/api/v3/latest/aladin.js","https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js","https://cdn.jsdelivr.net/npm/aladin-lite@3.9.0-beta/dist/aladin.js"],bad=[],
-  ld=u=>new Promise((ok,no)=>{const s=document.createElement("script"),t=setTimeout(()=>{s.remove();no()},6000);s.src=u;s.onload=()=>{clearTimeout(t);window.A&&A.init?ok():no()};s.onerror=()=>{clearTimeout(t);no()};document.head.append(s)});
+  // Aladin Lite v3 on jsDelivr is an ES module: load it with import() (a classic <script> throws "Unexpected token 'export'")
+  const U=["https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js"],bad=[],
+  ld=u=>Promise.race([import(u).then(m=>{window.A||=m.default;if(!window.A?.init)throw 0}),new Promise((_,r)=>setTimeout(r,10000))]);
   let up=0;for(const u of U){try{await ld(u);up=1;break}catch{const h=new URL(u).hostname;bad.includes(h)||bad.push(h)}}
   if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
   await A.init;
