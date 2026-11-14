@@ -1,228 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>SPHEREx Live Flipbook</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0b0d17;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
-    #toolbar {
-      padding: 12px;
-      background-color: #161b2e;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      border-bottom: 1px solid #2c3554;
-    }
-    button {
-      background-color: #2b59c3;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 13px;
-    }
-    button:hover {
-      background-color: #3b6ee0;
-    }
-    button:disabled {
-      background-color: #444c66;
-      cursor: not-allowed;
-    }
-    button.play-btn {
-      background-color: #1f8a4c;
-      font-weight: bold;
-    }
-    input {
-      background-color: #0b0d17;
-      border: 1px solid #3c486b;
-      color: white;
-      padding: 7px 10px;
-      border-radius: 6px;
-      width: 150px;
-      font-size: 13px;
-    }
-    #status {
-      margin-left: auto;
-      font-size: 13px;
-      color: #a8b5d6;
-    }
-    #sky-map {
-      flex: 1;
-      width: 100%;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07050d">
+<title>Monstellar · SPHEREx Control</title>
+<style>
+:root{--bg:#07050d;--hud:#a78bfa;--hot:#f472b6;--ink:#ece8f8;--dim:rgba(214,206,228,.5);--ln:rgba(167,139,250,.28);--pn:rgba(12,8,22,.8);--ok:#4ade80;--warn:#fbbf24;--bad:#f87171;--mono:ui-monospace,'SF Mono',Consolas,'Liberation Mono',monospace;color-scheme:dark}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:radial-gradient(ellipse at 50% 45%,#1b1233 0,#07050d 70%);color:var(--ink);font:12px/1.4 var(--mono);letter-spacing:.05em;text-transform:uppercase;overflow:hidden}
+button,input{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;border:0;outline:0;background:none}button{cursor:pointer}
+:focus-visible{outline:1px solid var(--hot);outline-offset:2px}
+.pn{position:relative;background:var(--pn);border:1px solid var(--ln);backdrop-filter:blur(6px)}
+.pn::before,.pn::after{content:"";position:absolute;width:9px;height:9px;border:2px solid var(--hud)}
+.pn::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.pn::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+h2{font-size:10px;font-weight:400;color:var(--hud);padding:8px 12px;border-bottom:1px solid var(--ln);display:flex;justify-content:space-between}
+h2 em{font-style:normal;color:var(--dim)}
+header{position:fixed;inset:0 0 auto;height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--ln);background:var(--pn);z-index:2}
+header b{font-size:14px;letter-spacing:.3em}header b i{color:var(--hot);font-style:normal}
+header span{color:var(--dim)}
+#tt{position:absolute;left:50%;transform:translateX(-50%);color:var(--ink);letter-spacing:.2em}
+.st{display:flex;align-items:center;gap:16px}
+.led{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 8px currentColor;color:var(--warn);display:inline-block;margin-right:8px}
+.led[data-s=ok]{background:var(--ok);color:var(--ok)}.led[data-s=bad]{background:var(--bad);color:var(--bad)}.led[data-s=busy]{animation:bl .8s steps(2) infinite}
+@keyframes bl{50%{opacity:.2}}
+.rail,.tel{position:fixed;top:60px;width:224px;z-index:1}
+.rail{left:12px;bottom:88px;display:flex;flex-direction:column;gap:12px}
+.tel{right:12px}
+#nav{display:flex;flex-direction:column;overflow:auto}
+#nav button{display:grid;grid-template-columns:24px 1fr;padding:8px 12px;text-align:left;border-left:2px solid transparent;color:var(--dim);transition:.14s}
+#nav button small{grid-column:2;font-size:10px;opacity:.6}
+#nav button:hover{background:rgba(167,139,250,.08);color:var(--ink)}
+#nav button.on{border-left-color:var(--hot);background:rgba(244,114,182,.1);color:var(--ink)}
+#nav button.on::first-line{color:var(--hot)}
+form{display:flex;flex-direction:column;gap:8px;padding:12px;margin-top:auto}
+form input{height:36px;padding:0 10px;border:1px solid var(--ln);background:rgba(0,0,0,.35)}
+form input::placeholder{color:var(--dim)}
+form button{height:36px;border:1px solid var(--hud);color:var(--hud);transition:.14s}
+form button:hover{background:var(--hud);color:var(--bg)}
+.tel dl{padding:8px 12px 12px;display:grid;grid-template-columns:auto 1fr;gap:8px 12px}
+.tel dt{color:var(--dim)}.tel dd{text-align:right;color:var(--ink)}.tel dd small{display:block;color:var(--hud);font-size:10px}
+main{position:fixed;inset:60px 248px 88px;container-type:size;display:grid;place-items:center}
+.sq{position:relative;width:min(100cqw,100cqh);aspect-ratio:1;background:linear-gradient(var(--ln) 1px,transparent 1px) 0 0/10% 10%,linear-gradient(90deg,var(--ln) 1px,transparent 1px) 0 0/10% 10%,#0b0716;box-shadow:0 0 0 1px var(--ln),0 0 60px rgba(124,77,235,.18)}
+.sq::before,.sq::after{content:"";position:absolute;pointer-events:none}
+.sq::before{left:0;right:0;top:-9px;height:6px;background:repeating-linear-gradient(90deg,var(--hud) 0 1px,transparent 1px 10%)}
+.sq::after{inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
+canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.hud{position:absolute;inset:0;width:100%;height:100%;color:var(--hud);pointer-events:none;overflow:visible;z-index:1}
+.hud text{font:2px var(--mono);fill:currentColor;stroke:none}
+.spin{transform-origin:50px 50px;animation:sp 24s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#s{position:absolute;left:50%;bottom:7%;transform:translateX(-50%);padding:8px 16px;background:var(--pn);border:1px solid var(--ln);text-align:center;z-index:2;max-width:92%}
+#s.err{color:var(--bad);border-color:var(--bad)}
+footer.pn{position:fixed;left:12px;right:12px;bottom:12px;height:64px;display:flex;align-items:center;gap:12px;padding:0 12px;z-index:1}
+footer>button{height:40px;min-width:40px;padding:0 14px;border:1px solid var(--ln);transition:.14s}
+footer>button:hover:not(:disabled){border-color:var(--hud);background:rgba(167,139,250,.12)}
+footer>button:disabled{opacity:.3;cursor:not-allowed}
+#pl{background:var(--hud);color:var(--bg);border-color:var(--hud);min-width:84px;font-weight:700}
+#pl:hover:not(:disabled){background:var(--hot)!important;border-color:var(--hot)!important}
+#tl{flex:1;display:flex;height:44px;align-items:stretch}
+.tk{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:var(--dim);font-size:10px;padding:2px 0}
+.tk i{width:1px;flex:1;background:var(--ln);margin-bottom:3px;transition:.14s}
+.tk:hover i{background:var(--hud)}.tk.on{color:var(--hot)}.tk.on i{background:var(--hot);width:3px;box-shadow:0 0 10px var(--hot)}
+.ft{color:var(--dim);white-space:nowrap}
+#tbd{text-transform:none}
+@media(prefers-reduced-motion:reduce){.spin,.led{animation:none}}
+@media(max-width:900px){
+  header span{display:none}#tt{position:static;transform:none}
+  .rail{inset:56px 8px auto;width:auto;bottom:auto;flex-direction:row;gap:8px}
+  .rail>.pn:first-child{flex:1;min-width:0}.rail h2{display:none}#nav{flex-direction:row}#nav button{white-space:nowrap;padding:8px 10px}#nav small{display:none}
+  form{margin:0;flex-direction:row;padding:8px;width:210px}form input{width:100%}form button{padding:0 10px}
+  .tel{inset:auto 8px 84px;width:auto}.tel dl{grid-template-columns:repeat(4,auto);gap:4px 12px;padding:6px 10px}.tel dt,.tel dd{text-align:left;font-size:10px}.tel dd small{display:none}.tel h2{display:none}
+  main{inset:116px 8px 170px}footer{left:8px;right:8px;bottom:8px;gap:6px}.ft{display:none}.tk{font-size:0}.tk.on{font-size:9px}#nav button{padding:6px 10px}
+}
+</style>
 </head>
 <body>
+<header>
+  <b>MON<i>/</i>STELLAR <span>// SPHEREx QR2 · NASA IRSA</span></b>
+  <div id="tt">NO TARGET</div>
+  <div class="st"><div><i class="led" id="led" data-s="busy"></i><span id="ls">STANDBY</span></div><div><span>UTC</span> <span id="utc" style="color:var(--ink)">--:--:--</span></div></div>
+</header>
+<div class="rail">
+  <section class="pn"><h2>TARGETS <em id="cnt"></em></h2><nav id="nav"></nav></section>
+  <form class="pn" id="f"><input id="q" placeholder="RA, DEC (DEG)" autocomplete="off" aria-label="RA, Dec in degrees"><button>SLEW</button></form>
+</div>
+<main><div class="sq">
+  <canvas id="c" width="1" height="1"></canvas>
+  <svg class="hud" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width=".25">
+    <path stroke-width=".6" d="M0 6V0H6M94 0H100V6M100 94V100H94M6 100H0V94"/>
+    <path opacity=".75" d="M0 50H44M56 50H100M50 0V44M50 56V100"/>
+    <circle cx="50" cy="50" r="16.67" stroke-dasharray="1 1.2"/><circle cx="50" cy="50" r="33.33" stroke-dasharray="1 1.2"/>
+    <circle class="spin" cx="50" cy="50" r="7" stroke="var(--hot)" stroke-dasharray="3 2"/>
+    <path d="M33.33 49V51M66.67 49V51M16.67 49V51M83.33 49V51M49 33.33H51M49 66.67H51M49 16.67H51M49 83.33H51"/>
+    <path stroke="var(--hot)" stroke-width=".4" d="M47 50H53M50 47V53"/>
+    <text x="67.4" y="48.4">1′</text><text x="84.1" y="48.4">2′</text><text x="1.5" y="98.5">6′ FOV</text>
+  </svg>
+  <div id="s">SELECT A TARGET</div>
+</div></main>
+<aside class="tel pn"><h2>TELEMETRY <em>CUTOUT</em></h2>
+  <dl>
+    <dt>RA</dt><dd id="tra">—<small></small></dd>
+    <dt>DEC</dt><dd id="tdec">—<small></small></dd>
+    <dt>FRAME</dt><dd id="tfr">—</dd>
+    <dt>DATE</dt><dd id="tdt">—</dd>
+    <dt>BAND</dt><dd id="tbd">—</dd>
+    <dt>FOV</dt><dd>6.0′</dd>
+  </dl>
+</aside>
+<footer class="pn">
+  <button id="pv" disabled aria-label="Previous frame">◀</button><button id="pl" disabled>PLAY</button><button id="nx" disabled aria-label="Next frame">▶</button>
+  <div id="tl"></div><span class="ft">LOOP 700MS · ←/→ SPACE</span>
+</footer>
+<script>
+// IRSA sends no CORS headers, so browsers go through a proxy: worker.js on Cloudflare Workers.
+const PROXY="https://monstellar.gundegmaamunxjargal.workers.dev";
+const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["WISE 0855",133.795,-7.245],["RW Aurigae",76.956,30.401],["R Draconis",248.125,66.764]];
+const $=i=>document.getElementById(i),cv=$("c"),ctx=cv.getContext("2d"),p2=n=>String(n).padStart(2,"0"),
+P=u=>PROXY?`${PROXY}?u=${encodeURIComponent(u)}`:u,
+st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":"";$("led").dataset.s=e?"bad":t?"busy":"ok";$("ls").textContent=e?"FAULT":t?"ACQUIRING":"NOMINAL"},
+hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
+dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
+tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
+let F=[],k=0,tm,ac;
 
-  <div id="toolbar">
-    <strong>NASA Test Stars:</strong>
-    <button onclick="loadTarget(269.452, 4.693, 'Barnard\'s Star')">Barnard's Star</button>
-    <button onclick="loadTarget(331.077, -56.783, 'Epsilon Indi B')">Epsilon Indi B</button>
-    <button onclick="loadTarget(133.795, -7.245, 'WISE 0855')">WISE 0855</button>
-    <button onclick="loadTarget(76.956, 30.401, 'RW Aurigae')">RW Aurigae</button>
-    <button onclick="loadTarget(248.125, 66.764, 'R Draconis')">R Draconis</button>
+// minimal FITS reader: walks the HDUs and returns the first 2D image (SPHEREx cutout: IMAGE ext)
+function fits(buf){
+  const dv=new DataView(buf),td=new TextDecoder();let o=0;
+  while(o<buf.byteLength){
+    const h={};
+    for(let end=0;!end;o+=2880)for(let i=0;i<36;i++){
+      const c=td.decode(new Uint8Array(buf,o+i*80,80));
+      if(c.startsWith("END")){end=1;break}
+      if(c[8]=="=")h[c.slice(0,8).trim()]=c.slice(10).split("/")[0].trim();
+    }
+    const n=+h.NAXIS||0,bp=+h.BITPIX,by=Math.abs(bp)/8;let N=n?1:0;
+    for(let j=1;j<=n;j++)N*=+h["NAXIS"+j];
+    if(n==2){
+      const g={"-32":i=>dv.getFloat32(o+4*i),"-64":i=>dv.getFloat64(o+8*i),16:i=>dv.getInt16(o+2*i),32:i=>dv.getInt32(o+4*i)}[bp],a=new Float32Array(N);
+      for(let i=0;i<N;i++)a[i]=g(i);
+      return{w:+h.NAXIS1,h:+h.NAXIS2,a};
+    }
+    o+=Math.ceil(by*(+h.GCOUNT||1)*(N+(+h.PCOUNT||0))/2880)*2880;
+  }
+  throw Error("no image in FITS");
+}
 
-    <input type="text" id="custom-coords" placeholder="RA, Dec (e.g. 269.45, 4.69)">
-    <button onclick="searchCustom()">Search</button>
+// asinh stretch (2%..99.5%) + brand colour ramp -> offscreen canvas (FITS rows run bottom-up, so flip y)
+const S=[[16,11,26],[91,33,214],[244,114,182],[255,255,255]],ramp=t=>{const q=Math.min(2,t*3|0),f=t*3-q;return S[q].map((c,j)=>c+(S[q+1][j]-c)*f)};
+function paint({w,h,a}){
+  const v=[...a].filter(Number.isFinite).sort((x,y)=>x-y),lo=v[v.length*.02|0]??0,hi=v[v.length*.995|0]??1,
+  c=document.createElement("canvas");c.width=w;c.height=h;
+  const g=c.getContext("2d"),d=g.createImageData(w,h);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const p=a[(h-1-y)*w+x],t=Number.isFinite(p)?Math.asinh(10*Math.min(1,Math.max(0,(p-lo)/(hi-lo||1))))/Math.asinh(10):0;
+    d.data.set([...ramp(t),255],(y*w+x)*4);
+  }
+  g.putImageData(d,0,0);return c;
+}
 
-    <button class="play-btn" id="flip-btn" onclick="toggleFlipbook()" disabled>Play Flipbook</button>
-    <span id="status">Click a star to fetch live NASA SPHEREx cutouts</span>
-  </div>
+function show(n){
+  if(!F.length)return;
+  k=(n+F.length)%F.length;const f=F[k];
+  cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);
+  $("tfr").textContent=`${p2(k+1)} / ${p2(F.length)}`;$("tdt").textContent=f.d;$("tbd").textContent=f.w?`${f.w} µm`:"—";
+  [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",j==k));
+}
+const stop=()=>{clearInterval(tm);tm=0;$("pl").textContent="PLAY"};
+const play=()=>{if(F.length<2)return;$("pl").textContent="PAUSE";tm=setInterval(()=>show(k+1),700)};
+const toggle=()=>tm?stop():play();
 
-  <div id="sky-map"></div>
-
-  <script type="module">import A from "https://cdn.jsdelivr.net/npm/aladin-lite@3.9.2-beta/dist/aladin.js"; window.A = A;</script>
-  <script>
-    let map;
-    let frames = [];
-    let currentFrameIndex = 0;
-    let isPlaying = false;
-    let flipTimer = null;
-    let fetchController = null;
-
-    // Start the progressive zoomable sky map
-    const P = u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u);
-    addEventListener("load", () => A.init.then(() => {
-      map = A.aladin("#sky-map", {
-        survey: "P/2MASS/color",
-        fov: 0.15,
-        target: "269.452 4.693",
-        showCooGrid: false
-      });
+async function load(n,ra,dec){
+  stop();ac?.abort();ac=new AbortController;const sg=ac.signal;
+  F=[];cv.width=cv.height=1;ctx.clearRect(0,0,1,1);$("tl").innerHTML="";
+  ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
+  $("tt").textContent=n.toUpperCase();tel("tra",`${ra.toFixed(4)}°`,hms(ra));tel("tdec",`${dec.toFixed(4)}°`,dms(dec));["tfr","tdt","tbd"].forEach(i=>$(i).textContent="—");
+  [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
+  st("ACQUIRING SPHEREx SCANS FROM IRSA…");
+  try{
+    const x=new DOMParser().parseFromString(await(await fetch(P(`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2&POS=circle+${ra}+${dec}+0.02&MAXREC=300`),{signal:sg})).text(),"text/xml"),
+    f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),
+    R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]).slice(0,12);
+    if(!R.length)return st(`NO SPHEREx SCANS COVER THIS TARGET YET`,1);
+    let done=0;
+    await Promise.all(R.map(async(r,j)=>{
+      try{
+        const b=await(await fetch(P(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.1`),{signal:sg})).arrayBuffer(),
+        m=+r[t];
+        F[j]={c:paint(fits(b)),d:m?new Date((m-40587)*864e5).toISOString().slice(0,10):"—",w:+r[w]?(r[w]*1e6).toFixed(2):""};
+      }catch(e){if(e.name=="AbortError")throw e}
+      st(`DOWNLINK CUTOUTS ${++done}/${R.length}…`);
     }));
+    F=F.filter(Boolean);
+    if(!F.length)return st("NASA RETURNED NO USABLE CUTOUTS",1);
+    st("");
+    $("tl").innerHTML=F.map((f,j)=>`<button class="tk" data-j="${j}" title="${f.d}"><i></i>${f.d.slice(5)}</button>`).join("");
+    ["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);
+    show(0);
+  }catch(e){
+    if(e.name=="AbortError")return;
+    console.error(e);
+    st(PROXY?"LINK LOST: COULD NOT REACH NASA IRSA THROUGH THE PROXY":"BROWSER BLOCKED NASA IRSA (NO CORS). SET PROXY IN INDEX.HTML",1);
+  }
+}
 
-    function searchCustom() {
-      const val = document.getElementById("custom-coords").value.trim();
-      const parts = val.split(",").map(s => parseFloat(s.trim()));
-      if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
-        loadTarget(parts[0], parts[1], `Custom (${parts[0]}, ${parts[1]})`);
-      } else {
-        alert("Enter coordinates as: RA, Dec (for example: 269.452, 4.693)");
-      }
-    }
-
-    async function loadTarget(ra, dec, label) {
-      const status = document.getElementById("status");
-      const flipBtn = document.getElementById("flip-btn");
-
-      // Stop any running flipbook and cancel unfinished downloads
-      stopFlipbook();
-      if (fetchController) fetchController.abort();
-      fetchController = new AbortController();
-
-      // Clear old image layers from memory
-      frames.forEach(f => {
-        try { map.removeImageLayer(f.layer.name || f.layer); } catch (e) {}
-      });
-      frames = [];
-      flipBtn.disabled = true;
-
-      // Move camera to the target
-      if (map) {
-        map.gotoRaDec(ra, dec);
-        map.setFoV(0.08);
-      }
-
-      status.textContent = `Asking NASA SPHEREx archive for ${label}...`;
-
-      try {
-        // Step 1: Query NASA IRSA SIA2 endpoint for SPHEREx images at (ra, dec)
-        const siaUrl = `https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2&POS=circle+${ra}+${dec}+0.02&MAXREC=200`;
-        const response = await fetch(P(siaUrl), { signal: fetchController.signal });
-        const xml = new DOMParser().parseFromString(await response.text(), "text/xml");
-        const fields = [...xml.getElementsByTagName("FIELD")].map(f => f.getAttribute("name"));
-        const urlIdx = fields.indexOf("access_url"), timeIdx = fields.indexOf("t_min");
-        const rows = [...xml.getElementsByTagName("TR")].map(tr => [...tr.getElementsByTagName("TD")].map(td => td.textContent.trim()));
-
-        const sortedRows = rows
-          .filter(r => r[urlIdx] && r[urlIdx].includes("/ibe/"))
-          .sort((a, b) => a[timeIdx] - b[timeIdx])
-          .slice(0, 10);
-
-        if (!sortedRows.length) {
-          status.textContent = `No SPHEREx exposures found yet for ${label}.`;
-          return;
-        }
-
-        status.textContent = `Found ${sortedRows.length} SPHEREx scans. Loading cropped cutouts...`;
-
-        // Step 2: Build server-side cropped cutout URLs (?center=RA,DEC&size=3arcmin)
-        for (let i = 0; i < sortedRows.length; i++) {
-          const rawUrl = sortedRows[i][urlIdx];
-          const mjd = parseFloat(sortedRows[i][timeIdx]);
-          const joinChar = rawUrl.includes("?") ? "&" : "?";
-          const cutoutUrl = `${rawUrl}${joinChar}center=${ra},${dec}&size=0.05`;
-
-          // Convert MJD timestamp into a readable date
-          const dateStr = mjd
-            ? new Date((mjd - 40587) * 86400000).toISOString().split("T")[0]
-            : `Frame ${i + 1}`;
-
-          // Add FITS cutout directly as an Aladin Lite overlay layer
-          const layer = map.displayFITS(P(cutoutUrl), {
-            name: `spherex_${i}`,
-            opacity: i === 0 ? 1.0 : 0.0
-          });
-
-          frames.push({ layer, dateStr });
-        }
-
-        currentFrameIndex = 0;
-        flipBtn.disabled = false;
-        status.textContent = `Ready! Showing ${frames[0].dateStr} (1 of ${frames.length})`;
-
-      } catch (err) {
-        if (err.name === "AbortError") return;
-        console.error(err);
-        status.textContent = `Could not reach NASA IRSA directly (check browser console or CORS).`;
-      }
-    }
-
-    function showFrame(index) {
-      frames.forEach((f, idx) => {
-        if (f.layer && f.layer.setOpacity) {
-          f.layer.setOpacity(idx === index ? 1.0 : 0.0);
-        }
-      });
-      const status = document.getElementById("status");
-      status.textContent = `Frame ${index + 1}/${frames.length} — Date: ${frames[index].dateStr}`;
-    }
-
-    function toggleFlipbook() {
-      if (isPlaying) {
-        stopFlipbook();
-      } else {
-        startFlipbook();
-      }
-    }
-
-    function startFlipbook() {
-      if (frames.length < 2) return;
-      isPlaying = true;
-      document.getElementById("flip-btn").textContent = "Pause Flipbook";
-
-      flipTimer = setInterval(() => {
-        currentFrameIndex = (currentFrameIndex + 1) % frames.length;
-        showFrame(currentFrameIndex);
-      }, 700);
-    }
-
-    function stopFlipbook() {
-      isPlaying = false;
-      clearInterval(flipTimer);
-      document.getElementById("flip-btn").textContent = "Play Flipbook";
-    }
-  </script>
+T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=n;b.innerHTML=`${p2(i+1)}<span>${n}</span><small>${ra}° ${dec>0?"+":""}${dec}°</small>`;b.onclick=()=>load(n,ra,dec);$("nav").append(b)});
+$("cnt").textContent=`[${T.length}]`;
+$("f").onsubmit=e=>{
+  e.preventDefault();
+  const [ra,dec]=$("q").value.split(/[,\s]+/).filter(Boolean).map(Number);
+  if(!Number.isFinite(ra)||!Number.isFinite(dec)||Math.abs(dec)>90)return st("ENTER COORDINATES AS: RA, DEC IN DEGREES (E.G. 269.452, 4.693)",1);
+  load("Custom",ra,dec);
+};
+$("pl").onclick=toggle;$("pv").onclick=()=>{stop();show(k-1)};$("nx").onclick=()=>{stop();show(k+1)};
+$("tl").onclick=e=>{const b=e.target.closest(".tk");if(b){stop();show(+b.dataset.j)}};
+addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(e.key=="ArrowLeft")$("pv").click();else if(e.key=="ArrowRight")$("nx").click();else if(e.key==" "){e.preventDefault();$("pl").disabled||toggle()}});
+setInterval(()=>$("utc").textContent=new Date().toISOString().slice(11,19),1e3);$("utc").textContent=new Date().toISOString().slice(11,19);
+load(...T[0]);
+</script>
 </body>
 </html>
