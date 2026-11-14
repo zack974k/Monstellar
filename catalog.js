@@ -1,71 +1,53 @@
 // Monstellar catalog add-on. Load AFTER the main script and targets.js:
 //   <script src="targets.js"></script><script src="catalog.js"></script>
-// Uses the main script's globals ($, load, tab, V). Adds a CATALOG button (key T),
-// a searchable panel of all targets, and exact-name matching in the CMD box.
+// Adds a searchable list of all targets directly under the 5 featured targets,
+// and exact-name matching in the CMD box. Uses the main script's globals ($, load, V).
 (()=>{
 const CAT=typeof CATALOG!="undefined"?CATALOG:[];
 if(!CAT.length)return;
 
 const css=document.createElement("style");
 css.textContent=`
-#cat{display:flex;flex-direction:column;left:372px;top:84px;width:320px;max-height:calc(100vh - 190px);z-index:4}
-#cat .pb{display:flex;flex-direction:column;min-height:0;flex:1}
-#cq{width:100%;padding:4px 0 8px;border-bottom:1px solid var(--ln);font-size:13px;caret-color:var(--a)}
+#cw{display:flex;flex-direction:column;gap:6px}
+#cq{width:100%;padding:7px 12px;font-size:13px;caret-color:var(--a);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln)}
 #cq::placeholder{color:var(--lb)}
-#cl{flex:1;min-height:0;margin-top:8px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent;overscroll-behavior:contain;display:flex;flex-direction:column;gap:2px}
-#cl button{flex:none;text-align:left;padding:5px 10px;font:600 13px var(--disp);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln)}
+#cl{max-height:clamp(90px,calc(100vh - 640px),260px);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent;overscroll-behavior:contain;display:flex;flex-direction:column;gap:2px}
+#cl button{flex:none;height:30px;display:flex;align-items:center;gap:12px;padding:0 12px;text-align:left;font:600 13px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:background .15s}
+#cl button span{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cl button:hover{background:color-mix(in srgb,var(--a) 18%,transparent)}
-#cl button.on{background:var(--a);color:#000;border-left-color:var(--a)}
-#cl small{display:block;font:11px var(--mono);letter-spacing:.04em;text-transform:none;color:var(--lb)}
-#cl button.on small{color:#000}
+#cl button.on{background:var(--a);color:#000;border-left-color:var(--a)}#cl button.on span{color:#000}
 #cl div{padding:8px;font:600 12px var(--disp);letter-spacing:.2em;color:var(--lb)}
-body:not([data-tab=t]) #cat{display:none}
-@media(max-width:1000px){#cat{left:10px;right:10px;width:auto;top:80px;max-height:calc(100vh - 170px)}}
 `;
 document.head.append(css);
 
-const pn=document.createElement("aside");
-pn.id="cat";pn.className="ui pnl";pn.hidden=true;
-pn.innerHTML=`<h2>Catalog</h2><div class="pb"><input id="cq" placeholder="SEARCH ${CAT.length} TARGETS" autocomplete="off" aria-label="Filter targets"><div id="cl"></div></div>`;
-document.body.append(pn);
-// the main script zooms on wheel; keep wheel scrolling the list instead
-pn.addEventListener("wheel",e=>e.stopPropagation());
-
-const bt=document.createElement("button");
-bt.className="chip";bt.id="cb";bt.textContent="CATALOG";bt.title="Browse all targets (T)";
-$("pal").before(bt);
+const wrap=document.createElement("div");
+wrap.id="cw";
+wrap.innerHTML=`<input id="cq" placeholder="SEARCH ${CAT.length} TARGETS" autocomplete="off" aria-label="Search all targets"><div id="cl"></div>`;
+$("nav").after(wrap);
 
 const fill=q=>{
   q=(q||"").trim().toLowerCase().replace(/^m\s*(\d+)$/,"messier $1");
-  const m=CAT.filter(r=>!q||(r[0]+" "+r[3]).toLowerCase().includes(q)),cur=typeof V!="undefined"&&V?V.n:"";
-  $("cl").replaceChildren(...m.map(([n,ra,dec,ty])=>{
-    const b=document.createElement("button"),s=document.createElement("span"),i=document.createElement("small");
-    b.dataset.n=n;b.className=n==cur?"on":"";s.textContent=n;
-    i.textContent=`${ty} · ${ra.toFixed(2)}° ${dec>0?"+":""}${dec.toFixed(2)}°`;
-    b.append(s,i);b.onclick=()=>{tog(false);load(n,ra,dec)};return b;
+  const cur=typeof V!="undefined"&&V?V.n:"",pad=n=>String(n).padStart(2,"0"),
+  m=CAT.map((r,i)=>[r,i]).filter(([r])=>!q||(r[0]+" "+r[3]).toLowerCase().includes(q));
+  $("cl").replaceChildren(...m.map(([[n,ra,dec,ty],i])=>{
+    const b=document.createElement("button"),s=document.createElement("span");
+    b.dataset.n=n;b.className=n==cur?"on":"";
+    b.title=`${ty} · RA ${ra}° Dec ${dec}°`;
+    b.append(pad(i+6),s);s.textContent=n;
+    b.onclick=()=>load(n,ra,dec);return b;
   }));
   if(!m.length){const d=document.createElement("div");d.textContent="NO MATCHING TARGETS";$("cl").append(d)}
 };
-const tog=o=>{
-  o=o===undefined?pn.hidden:o;
-  if(o&&document.body.dataset.tab!="t")tab("t");
-  pn.hidden=!o;
-  if(o){fill($("cq").value);if(matchMedia("(min-width:1001px)").matches)$("cq").focus()}
-};
-bt.onclick=()=>tog();
+fill("");
 $("cq").oninput=e=>fill(e.target.value);
-addEventListener("keydown",e=>{
-  if(e.key=="Escape")return tog(false);
-  if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey||e.altKey)return;
-  if(e.key.toLowerCase()=="t")tog();
-});
 
-// keep the highlighted catalog row in sync with whatever target is loaded
+// keep the highlighted row in sync with whatever target is loaded
 const L0=load;
 load=function(n,...a){
   [...$("cl").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   return L0.call(this,n,...a);
 };
+[...$("cl").children].forEach(b=>b.classList.toggle("on",b.dataset.n==V?.n));
 
 // CMD box: exact catalog names (M31, "47 Tucanae", Sirius…) load instantly; everything else goes to the original handler
 $("q").placeholder="NAME OR RA, DEC (DEG)";$("q").setAttribute("aria-label","Target name, or RA and Dec in degrees");
