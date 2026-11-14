@@ -79,7 +79,7 @@ dt{font:600 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color
 .keys{left:16px;right:16px;bottom:10px;display:flex;gap:22px;font:600 10px var(--disp);letter-spacing:.2em;text-transform:uppercase;color:var(--lb);white-space:nowrap;overflow:hidden}
 kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color:var(--a)}
 #s{position:fixed;left:50%;bottom:116px;transform:translateX(-50%);z-index:3;padding:5px 16px;border-left:3px solid var(--a);background:rgba(0,0,0,.65);font:600 12px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--a);text-align:center;max-width:90%}
-#s.err{color:var(--er);border-left-color:var(--er)}
+#s.err{color:var(--er);border-left-color:var(--er)}#s.ld{bottom:auto;top:calc(50% + 96px);font-size:15px;padding:10px 22px;background:rgba(0,0,0,.75)}#s.ld::before{content:"";display:block;height:2px;margin:0 -22px 9px;background:linear-gradient(90deg,transparent,var(--a),transparent) no-repeat;background-size:50% 100%;animation:ldb 1.2s linear infinite}#s.ld::after{content:" · " attr(data-e)}@keyframes ldb{from{background-position:-50% 0}to{background-position:150% 0}}
 #ak{position:fixed;inset:0;z-index:1;display:none;background:#000}
 body[data-tab=sk] #ak{display:block}
 body[data-tab=sk] #c,body[data-tab=sk] #hd,body[data-tab=sk] .ctl{visibility:hidden}
@@ -176,7 +176,7 @@ const PROXY="https://monstellar.gundegmaamunxjargal.workers.dev";
 const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["WISE 0855",133.795,-7.245],["RW Aurigae",76.956,30.401],["R Draconis",248.125,66.764],["W33A (ice-rich)",273.6625,-17.867],["NGC 7538 IRS 9",348.507,61.456],["Elias 29",246.789,-24.622]];
 const $=i=>document.getElementById(i),cv=$("c"),ctx=cv.getContext("2d"),p2=n=>String(n).padStart(2,"0"),
 P=u=>PROXY?`${PROXY}?u=${encodeURIComponent(u)}`:u,
-st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":"";$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent="IRSA "+(e?"FAULT":t?"ACQUIRING":"NOMINAL")},
+st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&&/^(Loading|Finding|Looking)/.test(t)?"ld":"";clearTimeout(st.k);const s0=st.s||(st.s=Date.now());e||!t?st.s=0:(function f(){$("s").dataset.e=Math.round((Date.now()-s0)/1e3)+"s";st.k=setTimeout(f,500)})();$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent="IRSA "+(e?"FAULT":t?"ACQUIRING":"NOMINAL")},
 hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
 dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
@@ -252,7 +252,7 @@ async function load(n,ra,dec,z=.25,keep){
   !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();ac=new AbortController;const sg=ac.signal;bz=1;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
-  V={n,ra,dec,z};keep||($("bg").hidden=0,$("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
+  V={n,ra,dec,z};$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   st("Finding SPHEREx scans…");
   try{
