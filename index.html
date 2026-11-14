@@ -75,7 +75,7 @@ dt{font:600 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color
 #tl::before{content:"";position:absolute;left:0;right:0;bottom:6px;height:1px;background:var(--ln)}
 .tk{position:absolute;bottom:0;width:16px;height:24px;transform:translateX(-50%);display:flex;align-items:flex-end;justify-content:center}
 .tk i{width:1px;height:var(--h);margin-bottom:6px;background:var(--lb)}
-.tk:hover i{background:var(--ink);width:2px}.tk.on i{background:var(--a);width:2px}.tk.ld,.tk.x{cursor:default}.tk.x i{background:#f66;opacity:.6}.tk.ld i{opacity:.3}.tk.cur i{animation:ld .8s ease-in-out infinite alternate}@keyframes ld{to{opacity:1;height:calc(var(--h) + 8px)}}.tk.on::after{content:"";position:absolute;bottom:2px;width:9px;height:9px;background:var(--a);box-shadow:0 0 0 2px #000}
+.tk:hover i{background:var(--ink);width:2px}.tk.on i{background:var(--a);width:2px}.tk.ld,.tk.x{cursor:default}.tk.x i{background:#f66;opacity:.6}.tk.ld i{opacity:.3}.tk.cur i{animation:ld .8s ease-in-out infinite alternate}@keyframes ld{to{opacity:1;height:calc(var(--h) + 8px)}}.tk.ld::after{content:"";position:absolute;bottom:2px;width:9px;height:9px;border:1px solid var(--a);animation:tkr 1.2s linear infinite}@keyframes tkr{to{transform:rotate(360deg)}}.tk.on::after{content:"";position:absolute;bottom:2px;width:9px;height:9px;background:var(--a);box-shadow:0 0 0 2px #000}
 .keys{left:16px;right:16px;bottom:10px;display:flex;gap:22px;font:600 10px var(--disp);letter-spacing:.2em;text-transform:uppercase;color:var(--lb);white-space:nowrap;overflow:hidden}
 kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color:var(--a)}
 #s{position:fixed;left:50%;bottom:116px;transform:translateX(-50%);z-index:3;padding:5px 16px;border-left:3px solid var(--a);background:rgba(0,0,0,.65);font:600 12px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--a);text-align:center;max-width:90%}
@@ -167,8 +167,6 @@ body[data-tab=sk] #sr{display:block}
 </footer>
 <div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>P</kbd>Spectrum</span><span><kbd>B</kbd>Blink</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>Tabs</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
 <script>
-// GitHub Pages caches HTML ~10 min: re-fetch self uncached; if the ETag changed, reload onto the fresh copy
-setTimeout(()=>fetch(location.href,{cache:"reload"}).then(r=>{const e=r.headers.get("etag"),o=localStorage.e;if(e){localStorage.e=e;o&&o!=e&&location.reload()}}).catch(()=>{}),4000);
 // keep the saved-frames cache bounded (newest 300 entries)
 setTimeout(()=>window.caches&&caches.open("mst1").then(async c=>{const k=await c.keys();k.slice(0,Math.max(0,k.length-300)).forEach(r=>c.delete(r))}).catch(()=>0),8000);
 // IRSA sends no CORS headers, so browsers go through a proxy: worker.js on Cloudflare Workers.
@@ -182,15 +180,17 @@ dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
 let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,sp=700;
 const M={},M0=fetch("cut/m.json").then(r=>r.json()).then(j=>Object.assign(M,j)).catch(()=>0);
-const C=new Map,G=async(u,sg,tx,pc)=>{if(!C.has(u)){
+const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg,tx,pc)=>{if(!C.has(u)){let p=FL.get(u);if(!p){p=(async()=>{
   const ch=pc&&window.caches?await caches.open("mst1").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
-  if(hit&&tx&&Date.now()-hit.headers.get("x-t")>216e5)hit=0;
+  if(hit&&tx&&Date.now()-hit.headers.get("x-t")>6048e5)hit=0;
   if(hit)C.set(u,await hit[tx?"text":"arrayBuffer"]());
   else if(await M0,M[u])C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());
-  else{for(let n=0;;n++)try{const r=await fetch(P(u),{signal:AbortSignal.any([sg,AbortSignal.timeout(tx?8e3:6e4)])});if(!r.ok)throw Error(r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());break}catch(e){if(sg.aborted||n>1)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}
+  else{for(let n=0;;n++)try{const r=await fetch(P(u),{signal:AbortSignal.timeout(tx?3e4:9e4)});if(!r.ok)throw Error(r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());break}catch(e){if(n>2)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}
     ch&&ch.put(u,new Response(tx?C.get(u):C.get(u).slice(0),{headers:{"x-t":Date.now()}})).catch(()=>0)}
-  if(C.size>80)C.delete(C.keys().next().value)}return C.get(u)};
-const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=5,sk=()=>document.body.dataset.tab=="sk";
+  if(C.size>250)C.delete(C.keys().next().value)})().finally(()=>FL.delete(u));FL.set(u,p)}
+  await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}
+  if(sg.aborted)throw AE();return C.get(u)};
+const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=12,sk=()=>document.body.dataset.tab=="sk";
 // spectrum mode: instead of an even spread, take the exposures nearest a wavelength ladder that is dense around the H2O / CO2 / CO ice bands
 const LAD=[.8,1.2,1.6,2,2.4,2.6,2.7,2.8,2.9,3,3.1,3.2,3.35,3.6,3.75,4.05,4.15,4.22,4.27,4.32,4.4,4.5,4.58,4.64,4.67,4.7,4.8,4.9],
 ladder=(R,w,wx)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6,used=new Set,o=[];for(const l of LAD){let b=-1,bd=1e9;R.forEach((r,i)=>{const d=Math.abs(m(r)-l);if(!used.has(i)&&d<bd){bd=d;b=i}});if(b>=0&&bd<.06){used.add(b);o.push(R[b])}}return o.length>1?o:R.slice(0,12)};
@@ -261,7 +261,7 @@ async function load(n,ra,dec,z=.25,keep){
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[wm?w:t]-b[wm?w:t]);
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
-    $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
+    $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
     W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
     const res=Array(S.length);let nx=0,dn=0;st(`Loading images 0 of ${S.length}…`);
     const one=async j=>{
@@ -276,7 +276,7 @@ async function load(n,ra,dec,z=.25,keep){
       }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";B.title="Failed"}
       st(`Loading images ${++dn} of ${S.length}…`);
     };
-    await Promise.all(Array.from({length:Math.min(CONC,S.length)},async()=>{while(nx<S.length)await one(nx++)}));
+    await Promise.all(S.map((_,j)=>one(j)));
     if(!F.length)return st("No usable images came back from IRSA",1);
     st("");bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
@@ -377,7 +377,7 @@ gosp=()=>{tab("sp");if(!wm&&V){wm=1;nb();load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>do
 let al,alp,pp=[0,0];const ping=()=>{const p=$("pg");p.style.left=pp[0]+"px";p.style.top=pp[1]+"px";p.classList.remove("on");void p.offsetWidth;p.classList.add("on")};
 const aladin=()=>alp||(alp=(async()=>{
   // Aladin Lite v3 on jsDelivr is an ES module: load it with import() (a classic <script> throws "Unexpected token 'export'")
-  const U=["https://cdn.jsdelivr.net/npm/aladin-lite@3/dist/aladin.js"],bad=[],
+  const U=["https://cdn.jsdelivr.net/npm/aladin-lite@3.8.2/dist/aladin.js"],bad=[],
   ld=u=>Promise.race([import(u).then(m=>{window.A||=m.default;if(!window.A?.init)throw 0}),new Promise((_,r)=>setTimeout(r,10000))]);
   let up=0;for(const u of U){try{await ld(u);up=1;break}catch{const h=new URL(u).hostname;bad.includes(h)||bad.push(h)}}
   if(!up)throw Error("ALADIN LIBRARY UNREACHABLE ("+bad.join(", ")+")");
@@ -479,6 +479,7 @@ requestAnimationFrame(function tick(t){
     const r=L.z/V.z,[a,b,c,d]=L.m,D=a*d-b*c||1,x=K.has("d")-K.has("a"),y=K.has("s")-K.has("w"),zi=K.has("=")-K.has("-");
     if((x||y)&&!sk()){const n=.4*cv.width*dt/r/Math.hypot(x,y);pn(x*n,y*n)}
     if(zi&&!sk())zm(Math.exp(-zi*1.5*dt));
+    if(sk()&&al&&(x||y||zi))try{const[ra,de]=al.getRaDec(),f=al.getFov()[0],n=f*.5*dt;zi&&al.setFoV(Math.min(180,Math.max(.01,f*Math.exp(-zi*1.5*dt))));(x||y)&&al.gotoRaDec((ra-x*n/Math.max(.1,Math.cos(de*Math.PI/180))+360)%360,Math.max(-89.9,Math.min(89.9,de-y*n)))}catch{}
     const s=Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height)*L.z/V.z,u=((V.ra-L.ra+540)%360-180)*Math.cos(L.dec*Math.PI/180),w=V.dec-L.dec;
     cv.style.transform=`translate(${-(d*u-b*w)/D*s}px,${(a*w-c*u)/D*s}px) scale(${L.z/V.z})`;
   }
@@ -488,7 +489,7 @@ requestAnimationFrame(function tick(t){
 });
 addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
-load(...T[0]).then(async()=>{for(const[,r,d]of T.slice(1))await pre(r,d)});
+load(...T[0]).then(async()=>{for(const[,r,d]of T.slice(1)){while(bz)await new Promise(r=>setTimeout(r,2e3));await pre(r,d)}});
 </script>
 <script src="targets.js"></script><script src="catalog.js"></script>
 </body>
