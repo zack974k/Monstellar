@@ -107,6 +107,8 @@ kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color
 </footer>
 <div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
 <script>
+// GitHub Pages caches HTML ~10 min: re-fetch self uncached; if the ETag changed, reload onto the fresh copy
+fetch(location.href,{cache:"reload"}).then(r=>{const e=r.headers.get("etag"),o=localStorage.e;if(e){localStorage.e=e;o&&o!=e&&location.reload()}}).catch(()=>{});
 // IRSA sends no CORS headers, so browsers go through a proxy: worker.js on Cloudflare Workers.
 const PROXY="https://monstellar.gundegmaamunxjargal.workers.dev";
 const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["WISE 0855",133.795,-7.245],["RW Aurigae",76.956,30.401],["R Draconis",248.125,66.764]];
