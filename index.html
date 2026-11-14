@@ -80,7 +80,7 @@ footer>button:disabled{opacity:.3;cursor:not-allowed}
 </head>
 <body>
 <header>
-  <b>MON<i>/</i>STELLAR <span>// SPHEREx QR2 · NASA IRSA</span></b>
+  <b>MON<i>/</i>STELLAR <span>// SPHEREx QR3 · NASA IRSA</span></b>
   <div id="tt">NO TARGET</div>
   <div class="st"><div><i class="led" id="led" data-s="busy"></i><span id="ls">STANDBY</span></div><div><span>UTC</span> <span id="utc" style="color:var(--ink)">--:--:--</span></div></div>
 </header>
@@ -181,7 +181,7 @@ async function load(n,ra,dec){
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   st("ACQUIRING SPHEREx SCANS FROM IRSA…");
   try{
-    const x=new DOMParser().parseFromString(await(await fetch(P(`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2&POS=circle+${ra}+${dec}+0.02&MAXREC=300`),{signal:sg})).text(),"text/xml"),
+    const x=new DOMParser().parseFromString(await(await fetch(P(`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`),{signal:sg})).text(),"text/xml"),
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]).slice(0,12);
     if(!R.length)return st(`NO SPHEREx SCANS COVER THIS TARGET YET`,1);
