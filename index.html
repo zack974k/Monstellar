@@ -82,7 +82,7 @@
 
   <div id="sky-map"></div>
 
-  <script src="https://aladin.cds.unistra.fr/AladinLite/api/v3/latest/aladin.js" charset="utf-8"></script>
+  <script type="module">import A from "https://cdn.jsdelivr.net/npm/aladin-lite@3.9.2-beta/dist/aladin.js"; window.A = A;</script>
   <script>
     let map;
     let frames = [];
@@ -92,14 +92,15 @@
     let fetchController = null;
 
     // Start the progressive zoomable sky map
-    A.init.then(() => {
+    const P = u => "https://api.allorigins.win/raw?url=" + encodeURIComponent(u);
+    addEventListener("load", () => A.init.then(() => {
       map = A.aladin("#sky-map", {
         survey: "P/2MASS/color",
         fov: 0.15,
         target: "269.452 4.693",
         showCooGrid: false
       });
-    });
+    }));
 
     function searchCustom() {
       const val = document.getElementById("custom-coords").value.trim();
@@ -138,7 +139,7 @@
       try {
         // Step 1: Query NASA IRSA SIA2 endpoint for SPHEREx images at (ra, dec)
         const siaUrl = `https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr2&POS=circle+${ra}+${dec}+0.02&MAXREC=200`;
-        const response = await fetch(siaUrl, { signal: fetchController.signal });
+        const response = await fetch(P(siaUrl), { signal: fetchController.signal });
         const xml = new DOMParser().parseFromString(await response.text(), "text/xml");
         const fields = [...xml.getElementsByTagName("FIELD")].map(f => f.getAttribute("name"));
         const urlIdx = fields.indexOf("access_url"), timeIdx = fields.indexOf("t_min");
@@ -169,7 +170,7 @@
             : `Frame ${i + 1}`;
 
           // Add FITS cutout directly as an Aladin Lite overlay layer
-          const layer = map.displayFITS(cutoutUrl, {
+          const layer = map.displayFITS(P(cutoutUrl), {
             name: `spherex_${i}`,
             opacity: i === 0 ? 1.0 : 0.0
           });
