@@ -131,7 +131,7 @@ body[data-tab=sk] #sr{display:block}
   .tabs{left:10px;top:42px;transform:none}#lc{top:80px;left:10px;right:10px;width:auto}#gt{gap:10px}#nav{flex-direction:row;overflow:auto;scrollbar-width:none}#nav button{flex:none;padding:0 12px}
   #f{display:none}
   #tt{font-size:16px}#wl{font-size:26px;min-height:26px}.sc{flex-direction:column;align-items:flex-start}.sc>div{align-items:flex-start}
-  .ctl{left:10px;right:10px;bottom:10px;gap:8px}#t0,#t1{display:none}#s{bottom:76px}
+  .ctl{left:10px;right:10px;bottom:10px;gap:6px;overflow-x:auto}.ctl>button{padding:0 9px;flex:none}#tl{min-width:70px}#t0,#t1{display:none}#s{bottom:76px}
 }
 </style>
 </head>
@@ -160,19 +160,19 @@ body[data-tab=sk] #sr{display:block}
 </div>
 <aside id="sp" class="ui pnl"><h2>Spectrum</h2><div class="pb"><canvas id="sc" width="360" height="190" title="3×3 median at the crosshair, per band. Bright squares = crosshair, dots = field median. Move with WASD / drag."></canvas><div class="wr"><span id="sx"></span><span class="bt"><button class="chip" id="so" title="Hear the spectrum: pitch = wavelength, loudness = flux, chime = detected ice">▶ SONIFY</button><button class="chip" id="sv" title="Download CSV">CSV</button></span></div><div id="ic"></div></div></aside>
 <aside id="ob" class="ui pnl"><h2>Spectral</h2><div class="pb"><div id="wl"></div><div id="wb"></div><div class="wr"><span>0.75</span><span>5.00 µm</span></div>
-  <dl><dt>Date</dt><dd id="dt"></dd><dt>Frame</dt><dd id="fr"></dd></dl>
+  <dl><dt>Date</dt><dd id="dt"></dd><dt>Frame</dt><dd id="fr"></dd><dt>Flags</dt><dd id="fg"></dd></dl>
   <div class="sc"><svg id="cp" width="88" height="88" viewBox="-44 -44 88 88" fill="none" stroke="#fff" stroke-width="1.3"><line id="cn" x1="0" y1="0" x2="0" y2="-28"/><line id="ce" x1="0" y1="0" x2="-28" y2="0" stroke-opacity=".55"/><text id="tn" x="0" y="-38">N</text><text id="te" x="-38" y="0">E</text></svg><div><div id="sbar"></div><span id="sl"></span></div></div></div></aside>
 </div>
 
 
 <footer class="ui pnl ctl">
-  <button id="pv" disabled aria-label="Previous frame">‹</button><button id="pl" disabled>Play</button><button id="nx" disabled aria-label="Next frame">›</button><button id="bk" title="Blink same-wavelength frames across dates (B)">Blink</button>
+  <button id="pv" disabled aria-label="Previous frame">‹</button><button id="pl" disabled>Play</button><button id="nx" disabled aria-label="Next frame">›</button><button id="bk" title="Blink same-wavelength frames across dates (B)">Blink</button><button id="dfb" title="Subtract the previous frame (X)">Diff</button><button id="stb" title="Stack same-band (same-detector) frames; with Diff: frame minus the stack of the others (Y)">Stack</button><button id="gab" title="Gaia DR3 overlay, proper-motion corrected to the frame date (G)">Gaia</button><button id="wsb" title="AllWISE overlay (I)">WISE</button>
   <span id="t0"></span><div id="tl"></div><span id="t1"></span>
 </footer>
-<div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>P</kbd>Spectrum</span><span><kbd>B</kbd>Blink</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>Tabs</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
+<div class="ui keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>Move</span><span><kbd>+</kbd><kbd>−</kbd>Zoom</span><span><kbd>Space</kbd>Play</span><span><kbd>←</kbd><kbd>→</kbd>Frame</span><span><kbd>C</kbd>Display</span><span><kbd>P</kbd>Spectrum</span><span><kbd>B</kbd>Blink</span><span><kbd>X</kbd>Diff</span><span><kbd>Y</kbd>Stack</span><span><kbd>G</kbd>Gaia</span><span><kbd>I</kbd>WISE</span><span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>Tabs</span><span><kbd>Z</kbd>Fit</span><span><kbd>H</kbd>Hide</span><span><kbd>F</kbd>Full</span></div>
 <script>
 // keep the saved-frames cache bounded (newest 300 entries)
-setTimeout(()=>window.caches&&caches.open("mst1").then(async c=>{const k=await c.keys();k.slice(0,Math.max(0,k.length-300)).forEach(r=>c.delete(r))}).catch(()=>0),8000);
+setTimeout(()=>window.caches&&caches.open("mst2").then(async c=>{const k=await c.keys();k.slice(0,Math.max(0,k.length-300)).forEach(r=>c.delete(r))}).catch(()=>0),8000);
 // IRSA sends no CORS headers, so browsers go through a proxy: worker.js on Cloudflare Workers.
 const PROXY="https://monstellar.gundegmaamunxjargal.workers.dev";
 const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["WISE 0855",133.795,-7.245],["RW Aurigae",76.956,30.401],["R Draconis",248.125,66.764],["W33A (ice-rich)",273.6625,-17.867],["NGC 7538 IRS 9",348.507,61.456],["Elias 29",246.789,-24.622]];
@@ -182,22 +182,24 @@ st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&
 hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
 dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
 tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
-let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,sp=700;
+let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,df,stk,sp=700;const OV={g:0,w:0,G:[],W:[],i:0,k:{}};
 const M={},M0=fetch("cut/m.json").then(r=>r.json()).then(j=>Object.assign(M,j)).catch(()=>0);
 let LD={q:[],n:0},TR=[0,0,1,1];
 const pump=()=>{const L0=LD;while(L0.n<CONC&&L0.q.length){const fn=L0.q.shift();L0.n++;fn().catch(()=>0).finally(()=>{L0.n--;L0===LD&&pump()})}},enq=(fn,front)=>{front?LD.q.unshift(fn):LD.q.push(fn);pump()},
-put=(f,q,ox,oy)=>{for(let y=0;y<q.h;y++)for(let x=0;x<q.w;x++){const X=ox+x,Y=oy+y;X>=0&&Y>=0&&X<f.W&&Y<f.H&&(f.a[Y*f.W+X]=q.a[y*q.w+x])}},
-rep=f=>{const c=paint({w:f.W,h:f.H,a:f.a});f.c.getContext("2d").drawImage(c,0,0);f.c.md=c.md;f.sg=void 0;F[k]===f&&ctx.drawImage(f.c,0,0);spec()},
+put=(f,q,ox,oy)=>{for(let y=0;y<q.h;y++)for(let x=0;x<q.w;x++){const X=ox+x,Y=oy+y;X>=0&&Y>=0&&X<f.W&&Y<f.H&&(f.a[Y*f.W+X]=q.a[y*q.w+x],f.fg&&q.fg&&(f.fg[Y*f.W+X]=q.fg[y*q.w+x]))}},
+plc=(f,n)=>{const w=n.w,h=n.h,E=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]].map(([x,y])=>{const[r,d]=p2s(n,x,y);return s2p(f,r,d)}),X0=Math.max(0,Math.floor(Math.min(...E.map(e=>e[0])))-1),X1=Math.min(f.W-1,Math.ceil(Math.max(...E.map(e=>e[0])))+1),Y0=Math.max(0,Math.floor(Math.min(...E.map(e=>e[1])))-1),Y1=Math.min(f.H-1,Math.ceil(Math.max(...E.map(e=>e[1])))+1);let c=0;
+  for(let Y=Y0;Y<=Y1;Y++)for(let X=X0;X<=X1;X++){const j=Y*f.W+X;if(Number.isFinite(f.a[j]))continue;const[r,d]=p2s(f,X,Y),[tx,ty]=s2p(n,r,d),i=Math.round(tx),m=Math.round(ty);if(!(i>=0&&m>=0&&i<w&&m<h))continue;const v=n.a[m*w+i];if(!Number.isFinite(v))continue;f.a[j]=v;f.fg&&n.fg&&(f.fg[j]=n.fg[m*w+i]);c++}return c},
+rep=f=>{const c=paint({w:f.W,h:f.H,a:f.a});f.c.getContext("2d").drawImage(c,0,0);f.c.md=c.md;f.sg=void 0;F.forEach(x=>{x.dg=0;x.sk=0});F[k]===f&&(ctx.drawImage(dc(),0,0),$("fg").textContent=flg(f));spec()},
 mos=(f,q,bu,ts,sg,keep,ra,dec)=>{
-  const W=q.w*3+6,H=q.h*3+6;Object.assign(f,{q0:q,W,H,ox:q.w+3,oy:q.h+3,a:new Float32Array(W*H).fill(NaN),n:W,cr:[q.cr[0]+q.w+3,q.cr[1]+q.h+3,q.cr[2],q.cr[3]],T:Array(9).fill("q")});f.T[4]="d";put(f,q,f.ox,f.oy);f.c=paint({w:W,h:H,a:f.a});
-  f.fill=()=>{f.fill=0;const[a0,b0,c0,d0]=q.m,D0=a0*d0-b0*c0;for(let dj=-1;dj<2;dj++)for(let di=-1;di<2;di++)(di||dj)&&enq(async()=>{
-    const i=(dj+1)*3+di+1,dx=di*q.w,dy=dj*q.h,rc=(ra+(a0*dx+b0*dy)/Math.cos(dec*Math.PI/180)+360)%360,dc=dec+c0*dx+d0*dy;f.T[i]="l";
-    try{const n=fits(await G(`${bu}${rc.toFixed(5)},${dc.toFixed(5)}&size=${ts}`,sg,0,keep!=1)),xi=((n.cr[2]-q.cr[2]+540)%360-180)*Math.cos(q.cr[3]*Math.PI/180),et=n.cr[3]-q.cr[3],ox=f.ox+Math.round(q.cr[0]-1+(d0*xi-b0*et)/D0-(n.cr[0]-1)),oy=f.oy+Math.round(q.cr[1]-1+(a0*et-c0*xi)/D0-(n.cr[1]-1));put(f,n,ox,oy);f.T[i]="d";rep(f);lg("TILE",`tile ${di},${dj} loaded · ${n.w}×${n.h} px · offset ${ox-f.ox},${oy-f.oy}`,"r")}
+  const[a0,b0,c0,d0]=q.m,sc=Math.sqrt(Math.abs(a0*d0-b0*c0))||1,S=Math.max(8,Math.round(ts/sc)),W=3*S+6,H=W,[cx,cy]=s2p(q,ra,dec),ox=Math.round((W-1)/2-cx),oy=Math.round((H-1)/2-cy);Object.assign(f,{S,W,H,ox,oy,a:new Float32Array(W*H).fill(NaN),fg:q.fg?new Int32Array(W*H).fill(-1):void 0,n:W,cr:[q.cr[0]+ox,q.cr[1]+oy,q.cr[2],q.cr[3]],T:Array(9).fill("q")});f.T[4]="d";put(f,q,ox,oy);f.c=paint({w:W,h:H,a:f.a});
+  f.fill=()=>{f.fill=0;for(let dj=-1;dj<2;dj++)for(let di=-1;di<2;di++)(di||dj)&&enq(async()=>{
+    const i=(dj+1)*3+di+1,[p0,p1]=p2s(f,(W-1)/2+di*S,(H-1)/2+dj*S),rc=(p0%360+360)%360,dc=Math.max(-89.99,Math.min(89.99,p1));f.T[i]="l";
+    try{const n=fits(await G(`${bu}${rc.toFixed(5)},${dc.toFixed(5)}&size=${ts}`,sg,0,keep!=1)),pc=plc(f,n);f.T[i]="d";rep(f);lg("TILE",`tile ${di},${dj} loaded · ${n.w}×${n.h} px · ${pc} px placed`,"r")}
     catch(e){if(e.name!="AbortError"){f.T[i]="x";lg("ERR",`tile ${di},${dj} unavailable: ${e.message||e}`,"e")}}
   },1)}};
 const lg=(k,m,c)=>{const o=$("lo"),d=document.createElement("div");d.className=c||"";d.innerHTML=`<i>${new Date().toISOString().slice(11,23)}</i><b>${k}</b>`;d.append(m);o.append(d);while(o.children.length>300)o.firstChild.remove();o.scrollTop=o.scrollHeight};
 const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg,tx,pc)=>{const kd=tx?"XML":"FITS";if(!C.has(u)){let p=FL.get(u);if(p)lg("JOIN",`${kd} already in flight, sharing it\n    ${u}`);if(!p){p=(async()=>{
-  const ch=pc&&window.caches?await caches.open("mst1").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
+  const ch=pc&&window.caches?await caches.open("mst2").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
   if(hit&&tx&&Date.now()-hit.headers.get("x-t")>6048e5)hit=0;
   if(hit){C.set(u,await hit[tx?"text":"arrayBuffer"]());lg("HIT",`${kd} from browser cache · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}\n    ${u}`,"r")}
   else if(await M0,M[u]){C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());lg("BAKE",`${kd} from pre-baked ${M[u]} · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}`,"r")}
@@ -212,11 +214,62 @@ const LAD=[.8,1.2,1.6,2,2.4,2.6,2.7,2.8,2.9,3,3.1,3.2,3.35,3.6,3.75,4.05,4.15,4.
 ladder=(R,w,wx)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6,used=new Set,o=[];for(const l of LAD){let b=-1,bd=1e9;R.forEach((r,i)=>{const d=Math.abs(m(r)-l);if(!used.has(i)&&d<bd){bd=d;b=i}});if(b>=0&&bd<.06){used.add(b);o.push(R[b])}}return o.length>1?o:R.slice(0,12)};
 // BLINK: frames of ~the same wavelength taken on different dates (>1 h apart), so what changes is the sky, not the band
 const blink=(R,w,wx,t)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6;let best=[];for(const a of R){const c=[];R.forEach(b=>{Math.abs(m(a)-m(b))<.05&&c.every(x=>Math.abs(x[t]-b[t])>.04)&&c.push(b)});c.length>best.length&&(best=c)}return best.sort((a,b)=>a[t]-b[t]).slice(0,10)};
+//<<
+const sx=s=>{s=s.replace(/−/g,"-");const t=s.match(/[-+]?\d+(?:\.\d+)?/g);if(!t||!/^[-+\d.,:\s°hdms′″'"]+$/i.test(s))return;const v=t.map(Number),k=t.length/2;let ra,dec;if(k==1){[ra,dec]=v;/h/i.test(s)&&(ra*=15)}else if(k==2||k==3){const f=a=>Math.abs(a[0])+(a[1]||0)/60+(a[2]||0)/3600;ra=f(v.slice(0,k))*15;dec=f(v.slice(k))*(t[k][0]=="-"?-1:1)}else return;if(ra>=0&&ra<=360&&Math.abs(dec)<=90)return[ra,dec]},
+s2p=(f,r,d)=>{const[a,b,c,e]=f.m,D=a*e-b*c,[x0,y0,r0,d0]=f.cr,xi=((r-r0+540)%360-180)*Math.cos(d0*Math.PI/180),et=d-d0,S=f.sip,u0=(e*xi-b*et)/D,v0=(a*et-c*xi)/D;let u=u0,v=v0;if(S)for(let i=0;i<6;i++){const du=spf(S.A,u,v),dv=spf(S.B,u,v);u=u0-du;v=v0-dv}return[x0-1+u,y0-1+v]},
+p2s=(f,x,y)=>{const[a,b,c,e]=f.m,[x0,y0,r0,d0]=f.cr,S=f.sip;let u=x+1-x0,v=y+1-y0;if(S){const du=spf(S.A,u,v),dv=spf(S.B,u,v);u+=du;v+=dv}return[r0+(a*u+b*v)/Math.cos(d0*Math.PI/180),d0+c*u+e*v]},
+// wavelength + bandwidth (um) at array pixel x,y from the WCS-WAVE lookup table (bilinear); undefined if absent/implausible
+wl=(q,x,y)=>{const t=q.wv;if(!t)return;const k=t.X.length,p=(A,v)=>{let i=0;while(i<k-2&&A[i+1]<v)i++;return[i,Math.min(1,Math.max(0,(v-A[i])/(A[i+1]-A[i])))]},[i,u]=p(t.X,x+2-q.wc[0]),[j,s]=p(t.Y,y+2-q.wc[1]),V=(a,b,c)=>t.V[(b*k+a)*2+c],L=c=>(1-s)*((1-u)*V(i,j,c)+u*V(i+1,j,c))+s*((1-u)*V(i,j+1,c)+u*V(i+1,j+1,c)),r=[L(0),L(1)];return r.every(Number.isFinite)&&r[0]>.7&&r[0]<5.1?r:void 0},
+FN={0:"TRANSIENT",1:"OVERFLOW",2:"SUR_ERROR",6:"NONFUNC",7:"DICHROIC",9:"MISSING",10:"HOT",11:"COLD",15:"NONLINEAR",17:"PERSIST",19:"OUTLIER",20:"CROSSTALK",22:"GHOST",23:"GHOST_FPA",24:"GHOST_EXT",25:"STREAK",26:"BLOOM",27:"SNOWBALL",28:"HALO"},
+// quality bits OR-ed over the 3x3 pixels at the crosshair (SOURCE/FULLSAMPLE/PHANMISS are informational, not listed)
+flg=f=>{if(!f.fg)return"n/a";const w=f.n,h=f.fg.length/w,[x,y]=s2p(f,V.ra,V.dec).map(Math.round);let m=0,c=0;for(let j=-1;j<2;j++)for(let i=-1;i<2;i++){const X=x+i,Y=y+j,v=X>=0&&Y>=0&&X<w&&Y<h?f.fg[Y*w+X]:-1;v>=0&&(m|=v,c++)}if(!c)return"n/a";const n=Object.keys(FN).filter(b=>m>>b&1).map(b=>FN[b]);return n.length?n.join(" "):"CLEAR"},
+// DIFF: this frame minus the previous one, resampled onto this frame's grid through both WCSs (same-band frames only make physical sense)
+dc=()=>{const f=F[k],g=F[k-1];if(stk){const s=sdc(f);if(s)return s}if(!df||!g)return f.c;if(f.dg!==g){const w=f.n,h=f.a.length/w,gw=g.n,gh=g.a.length/gw,o=new Float32Array(f.a.length);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[r,d]=p2s(f,x,y),[gx,gy]=s2p(g,r,d),i=Math.round(gx),j=Math.round(gy);o[y*w+x]=f.a[y*w+x]-f.c.md-((i>=0&&j>=0&&i<gw&&j<gh?g.a[j*gw+i]:NaN)-g.c.md)}f.dg=g;f.dc=paint({w,h,a:o})}return f.dc};
+$("dfb").onclick=()=>{df=!df;$("dfb").classList.toggle("on",df);F.length&&show(k)};
+// SIP distortion polynomial (A/B terms, pixel offsets from CRPIX); s2p inverts it by fixed-point iteration
+const spf=(L,u,v)=>{let s=0;for(const[p,q,c]of L)s+=c*u**p*v**q;return s},
+// STACK: per-pixel median of the other frames in the same band (each SPHEREx detector has its own band, so same wavelength = same detector), resampled through the WCSs; with Diff on it is this frame minus that median, so movers and transients stand out
+sdc=f=>{const G=F.filter(g=>g!==f&&g.a&&Math.abs(g.w-f.w)<.05);if(!G.length){f.sn=0;return}
+  if(f.sk&&f.sk.d===!!df)return f.sk.c;
+  const w=f.n,h=f.a.length/w,o=new Float32Array(f.a.length),v=[];
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[r,d]=p2s(f,x,y);v.length=0;const z0=f.a[y*w+x]-f.c.md;df||Number.isFinite(z0)&&v.push(z0);
+    for(const g of G){const[gx,gy]=s2p(g,r,d),i=Math.round(gx),j=Math.round(gy),gw=g.n;if(i>=0&&j>=0&&i<gw&&j<g.a.length/gw){const z=g.a[j*gw+i]-g.c.md;Number.isFinite(z)&&v.push(z)}}
+    if(!v.length){o[y*w+x]=NaN;continue}v.sort((p,q)=>p-q);const n=v.length,m=n&1?v[n>>1]:(v[n/2-1]+v[n/2])/2;o[y*w+x]=df?z0-m:m}
+  f.sk={d:!!df,c:paint({w,h,a:o})};f.sn=G.length+(df?0:1);return f.sk.c},
+// CATALOGUE OVERLAYS (VizieR TAP via the Worker): Gaia DR3 (epoch 2016.0) and AllWISE (epoch ~2010.6), moved by their proper motion to each frame's date
+CT={g:{t:"I/355/gaiadr3",c:"RA_ICRS,DE_ICRS,Gmag,pmRA,pmDE",a:"RA_ICRS",b:"DE_ICRS",o:"Gmag",e:57388,n:"Gaia DR3"},w:{t:"II/328/allwise",c:"RAJ2000,DEJ2000,W2mag,pmRA,pmDE",a:"RAJ2000",b:"DEJ2000",o:"W2mag",e:55400,n:"AllWISE"}},
+ovf=async()=>{if(!V)return;const id=++OV.i;for(const q of["g","w"]){if(!OV[q])continue;const c=CT[q],r=+(V.z*.75).toFixed(3),ra=+V.ra.toFixed(3),de=+V.dec.toFixed(3),ky=`${ra},${de},${r}`;if(OV.k[q]===ky)continue;
+  try{const u=`https://tapvizier.cds.unistra.fr/TAPVizieR/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=csv&QUERY=${encodeURIComponent(`SELECT TOP 300 ${c.c} FROM "${c.t}" WHERE 1=CONTAINS(POINT('ICRS',${c.a},${c.b}),CIRCLE('ICRS',${ra},${de},${r})) ORDER BY ${c.o}`)}`,tx=await G(u,new AbortController().signal,1,1);
+    if(/^\s*</.test(tx))throw Error("TAP error");
+    const L=tx.trim().split(/\r?\n/).slice(1).map(l=>l.split(",").map(parseFloat)).filter(s=>s.length>=5&&Number.isFinite(s[0])&&Number.isFinite(s[1]));
+    if(id!=OV.i)return;OV[q.toUpperCase()]=L;OV.k[q]=ky;lg("CAT",`${c.n}: ${L.length} sources within ${r}°`,"r")}
+  catch(e){lg("ERR",`${c.n} catalogue failed: ${e.message||e}`,"e")}}},
+uu=()=>{if(!V)return;try{history.replaceState(0,"",`?ra=${V.ra}&dec=${V.dec}&fov=${V.z}${wm?"&mode=spec":bl?"&mode=blink":""}${df?"&diff=1":""}${stk?"&stack=1":""}${OV.g?"&gaia=1":""}${OV.w?"&wise=1":""}${/embed=1/.test(location.search)?"&embed=1":""}`)}catch{}},
+// markers are drawn on the #to canvas with the same transform the tiles use: circle = Gaia, diamond = AllWISE; movers (>=200 mas/yr) get a 10-year track (min 18 px) and a label
+ovl=()=>{if(sk()||!V||!(OV.g||OV.w))return;const f=F[k];if(!f||!f.cr||!L)return;
+  const pl=document.body.dataset.p;if(ovl.p!=pl){ovl.p=pl;ovl.A=getComputedStyle(document.body).getPropertyValue("--a").trim()||"#ffb000"}
+  const w=innerWidth,H=innerHeight,s=TR[2]*TR[3],hh=f.a.length/f.n,dt=E=>Number.isFinite(f.t)?(f.t-E)/365.25:0,pj=(r,d)=>{const[px,py]=s2p(f,r,d);return[w/2+TR[0]+s*(px+.5-cv.width/2),H/2+TR[1]+s*(hh-py-.5-cv.height/2)]};
+  tg.save();tg.strokeStyle=tg.fillStyle=ovl.A;tg.lineWidth=1.5;tg.font="11px 'Share Tech Mono',Consolas,monospace";
+  for(const q of["g","w"]){if(!OV[q])continue;const Cc=CT[q],T0=dt(Cc.e);
+    for(const[r,d,m,pa,pd]of OV[q.toUpperCase()]){
+      const cd=Math.cos(d*Math.PI/180),ok=Number.isFinite(pa)&&Number.isFinite(pd),mu=ok?Math.hypot(pa,pd):0,r1=r+(ok?pa*T0/3.6e6/cd:0),d1=d+(ok?pd*T0/3.6e6:0),[x,y]=pj(r1,d1);
+      if(!(x>-30&&x<w+30&&y>-30&&y<H+30))continue;
+      tg.beginPath();q=="g"?tg.arc(x,y,7,0,7):(tg.moveTo(x,y-9),tg.lineTo(x+9,y),tg.lineTo(x,y+9),tg.lineTo(x-9,y),tg.closePath());tg.stroke();
+      if(mu>=200){const[x2,y2]=pj(r1+pa*10/3.6e6/cd,d1+pd*10/3.6e6);let vx=x2-x,vy=y2-y;const l=Math.hypot(vx,vy)||1,k2=Math.max(1,18/l);vx*=k2;vy*=k2;
+        tg.beginPath();tg.moveTo(x,y);tg.lineTo(x+vx,y+vy);const an=Math.atan2(vy,vx);tg.moveTo(x+vx,y+vy);tg.lineTo(x+vx-7*Math.cos(an-.5),y+vy-7*Math.sin(an-.5));tg.moveTo(x+vx,y+vy);tg.lineTo(x+vx-7*Math.cos(an+.5),y+vy-7*Math.sin(an+.5));tg.stroke();
+        tg.textAlign="left";tg.fillText(`${Cc.n.split(" ")[0]} ${Number.isFinite(m)?m.toFixed(1):"?"} · ${(mu/1e3).toFixed(2)}″/yr`,x+10,y-10)}}}
+  tg.restore()};
+$("stb").onclick=()=>{stk=!stk;$("stb").classList.toggle("on",stk);uu();if(stk&&!bl)bk();else F.length&&show(k)};
+$("gab").onclick=()=>{OV.g=!OV.g;$("gab").classList.toggle("on",OV.g);uu();ovf()};
+$("wsb").onclick=()=>{OV.w=!OV.w;$("wsb").classList.toggle("on",OV.w);uu();ovf()};
+//>>
 const co=()=>{$("ra").textContent=hms(V.ra);$("de").textContent=dms(V.dec);$("fv").textContent=`${V.z.toFixed(3)}° (${(V.z*60).toFixed(1)}′)`};
 
+// SIP coefficients (A_p_q, B_p_q) from a header, if the WCS is TAN-SIP
+const sipk=h=>{if(!/SIP/.test(h.CTYPE1||""))return;const S={A:[],B:[]};for(const q in h){const m=q.match(/^([AB])_(\d+)_(\d+)$/);m&&Number.isFinite(+h[q])&&S[m[1]].push([+m[2],+m[3],+h[q]])}return S.A.length||S.B.length?S:void 0};
 // minimal FITS reader: walks the HDUs and returns the first 2D image (SPHEREx cutout: IMAGE ext)
 function fits(buf){
-  const dv=new DataView(buf),td=new TextDecoder();let o=0;
+  const dv=new DataView(buf),td=new TextDecoder();let o=0,R;
   while(o<buf.byteLength){
     const h={};
     for(let end=0;!end;o+=2880)for(let i=0;i<36;i++){
@@ -226,15 +279,17 @@ function fits(buf){
     }
     const n=+h.NAXIS||0,bp=+h.BITPIX,by=Math.abs(bp)/8;let N=n?1:0;
     for(let j=1;j<=n;j++)N*=+h["NAXIS"+j];
-    if(n==2){
-      const g={"-32":i=>dv.getFloat32(o+4*i),"-64":i=>dv.getFloat64(o+8*i),16:i=>dv.getInt16(o+2*i),32:i=>dv.getInt32(o+4*i)}[bp],a=new Float32Array(N);
+    const nm=h.EXTNAME||"";
+    if(n==2&&h.XTENSION!="BINTABLE"){
+      const g={"-32":i=>dv.getFloat32(o+4*i),"-64":i=>dv.getFloat64(o+8*i),16:i=>dv.getInt16(o+2*i),32:i=>dv.getInt32(o+4*i)}[bp],a=bp==32?new Int32Array(N):new Float32Array(N);
       for(let i=0;i<N;i++)a[i]=g(i);
       const G=q=>+h[q]||0,e1=h.CDELT1==null?1:G("CDELT1"),e2=h.CDELT2==null?1:G("CDELT2"),m=h.CD1_1!=null?[G("CD1_1"),G("CD1_2"),G("CD2_1"),G("CD2_2")]:[e1*(h.PC1_1==null?1:G("PC1_1")),e1*G("PC1_2"),e2*G("PC2_1"),e2*(h.PC2_2==null?1:G("PC2_2"))];
-      return{w:+h.NAXIS1,h:+h.NAXIS2,a,m,cr:[G("CRPIX1"),G("CRPIX2"),G("CRVAL1"),G("CRVAL2")],u:h.BUNIT||""};
+      nm=="FLAGS"?R&&(R.fg=a):nm=="VARIANCE"?R&&(R.va=a):R||(R={w:+h.NAXIS1,h:+h.NAXIS2,a,m,cr:[G("CRPIX1"),G("CRPIX2"),G("CRVAL1"),G("CRVAL2")],u:h.BUNIT||"",wc:[G("CRPIX1W"),G("CRPIX2W")],sip:sipk(h)});
     }
+    if(nm=="WCS-WAVE"&&R){const k=parseInt(h.TFORM1),r=i=>dv.getInt32(o+4*i);R.wv={X:Array.from({length:k},(_,i)=>r(i)),Y:Array.from({length:k},(_,i)=>r(k+i)),V:Array.from({length:2*k*k},(_,i)=>dv.getFloat32(o+8*k+4*i))}}
     o+=Math.ceil(by*(+h.GCOUNT||1)*(N+(+h.PCOUNT||0))/2880)*2880;
   }
-  throw Error("no image in FITS");
+  if(R)return R;throw Error("no image in FITS");
 }
 
 // asinh stretch (2%..99.5%) + brand colour ramp -> offscreen canvas (FITS rows run bottom-up, so flip y)
@@ -253,8 +308,8 @@ function paint({w,h,a}){
 function show(n){
   if(!F.length)return;$("bg").hidden=1;
   k=(n+F.length)%F.length;const f=F[k];f.fill&&f.fill();L={...W,m:f.m};
-  cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(f.c,0,0);if(!bl&&k!=pk){pk=k;cv.classList.remove("fl");void cv.offsetWidth;cv.classList.add("fl")}
-  $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`;sc();spec();bl&&($("bl").textContent=`BLINK · ${f.d}Z · ${f.w} µm · ${p2(k+1)}/${p2(F.length)}`);
+  cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(dc(),0,0);if(!bl&&k!=pk){pk=k;cv.classList.remove("fl");void cv.offsetWidth;cv.classList.add("fl")}
+  $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fg").textContent=flg(f);$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`+(+f.w?` · D${1+[1.11,1.64,2.42,3.82,4.42].filter(e=>+f.w>=e).length}`:"")+(stk?(f.sn?` · STACK ×${f.sn}`:" · NO STACK"):df&&!k?" · NO REF":"");sc();spec();bl&&($("bl").textContent=`BLINK · ${f.d}Z · ${f.w} µm · ${p2(k+1)}/${p2(F.length)}`);
   [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",b.dataset.j==k));
 }
 const stop=()=>{fl=0;clearInterval(tm);tm=0;$("pl").textContent="Play"};
@@ -268,7 +323,7 @@ async function load(n,ra,dec,z=.25,keep){
   !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
-  V={n,ra,dec,z};$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
+  V={n,ra,dec,z};uu();ovf();$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
   lg("CMD",`load "${n}" · RA ${ra} · DEC ${dec} · FOV ${z}° · mode ${wm?"spectrum":bl?"blink":"pick"}${keep?" (reload)":""}`);st("Finding SPHEREx scans…");
   try{
@@ -285,11 +340,11 @@ async function load(n,ra,dec,z=.25,keep){
       try{
         const bu=`${r[u]}${r[u].includes("?")?"&":"?"}center=`,ts=+(z/3).toFixed(5);await M0;const bk=!!M[`${bu}${ra},${dec}&size=${z}`];
         const b=await G(bk?`${bu}${ra},${dec}&size=${z}`:`${bu}${ra},${dec}&size=${ts}`,sg,0,keep!=1);if(sg.aborted)return;
-        const q=fits(b),m=+r[t],f={c:paint(q),m:q.m,a:q.a,n:q.w,cr:q.cr,u:q.u,l0:+r[w]*1e6,l1:+r[wx]*1e6,t:m,d:iso(m),w:+r[w]?(r[w]*1e6).toFixed(2):""},
-        cu=fl?f:F[k];bk?f.T=Array(9).fill("d"):mos(f,q,bu,ts,sg,keep,ra,dec);res[j]=f;F=res.filter(Boolean);
+        const q=fits(b),m=+r[t],wv=wl(q,...s2p(q,ra,dec)),f={c:paint(q),q,m:q.m,a:q.a,n:q.w,cr:q.cr,sip:q.sip,u:q.u,l0:wv?wv[0]-wv[1]/2:+r[w]*1e6,l1:wv?wv[0]+wv[1]/2:+r[wx]*1e6,t:m,d:iso(m),w:wv?wv[0].toFixed(2):+r[w]?(r[w]*1e6).toFixed(2):""},
+        cu=fl?f:F[k];bk?(f.T=Array(9).fill("d"),f.fg=q.fg):mos(f,q,bu,ts,sg,keep,ra,dec);res[j]=f;F=res.filter(Boolean);F.forEach(x=>x.sk=0);
         [...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
         B.className="tk";sl&&(sl.className="d");B.title=`${f.d} · ${f.w} µm`;
-        lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
+        lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}${wv?"":" · no WCS-WAVE, band range used"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
       }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";sl&&(sl.className="x");B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
       st(`Loading images ${++dn} of ${S.length}…`);
     };
@@ -307,8 +362,8 @@ T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=
 
 $("f").onsubmit=async e=>{
   e.preventDefault();
-  const q=$("q").value.trim();let[ra,dec]=q.split(/[,\s]+/).filter(Boolean).map(Number),n="Custom";
-  if(q&&!/^[-+\d.,\s]+$/.test(q)){st(`Looking up ${q}…`);try{const m=(await G(`https://cds.unistra.fr/cgi-bin/nph-sesame/-oI/SNV?${encodeURIComponent(q)}`,new AbortController().signal,1)).match(/%J\s+([\d.]+)\s+([+-][\d.]+)/);[ra,dec]=[+m[1],+m[2]];n=q}catch{return st(`COULD NOT FIND “${q}”`,1)}}
+  const q=$("q").value.trim();const cd=sx(q);let[ra,dec]=cd||q.split(/[,\s]+/).filter(Boolean).map(Number),n="Custom";
+  if(q&&!cd&&!/^[-+\d.,\s]+$/.test(q)){st(`Looking up ${q}…`);try{const m=(await G(`https://cds.unistra.fr/cgi-bin/nph-sesame/-oI/SNV?${encodeURIComponent(q)}`,new AbortController().signal,1)).match(/%J\s+([\d.]+)\s+([+-][\d.]+)/);[ra,dec]=[+m[1],+m[2]];n=q}catch{return st(`COULD NOT FIND “${q}”`,1)}}
   if(!Number.isFinite(ra)||!Number.isFinite(dec)||Math.abs(dec)>90)return st("ENTER COORDINATES AS: RA, DEC IN DEGREES (E.G. 269.452, 4.693) OR AN OBJECT NAME",1);
   load(n,ra,dec);
 };
@@ -323,14 +378,14 @@ function sc(){const f=F[k];if(!f||!f.m||!L)return;const[a,b,c,d]=f.m,D=a*d-b*c;i
   [["n",u([-b/D,a/D])],["e",u([d/D,-c/D])]].forEach(([i,p])=>{$("c"+i).setAttribute("x2",p[0]*28);$("c"+i).setAttribute("y2",p[1]*28);$("t"+i).setAttribute("x",p[0]*38);$("t"+i).setAttribute("y",p[1]*38)})}
 const FS=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
 $("fs").onclick=FS;$("c").onclick=()=>dg?dg=0:document.body.classList.toggle("hide");addEventListener("resize",sc);
-addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey)return;const q=e.key.toLowerCase();if(q=="h")$("c").click();else if(q=="f")FS();else if(q=="z"){document.body.classList.toggle("fit");sc()}else if(q=="c")pal();else if(q=="[")sp=Math.min(2e3,sp*1.4),tm&&(stop(),play());else if(q=="]")sp=Math.max(150,sp/1.4),tm&&(stop(),play());else if(q=="m"){wm=!wm;nb();V&&load(V.n,V.ra,V.dec,V.z,2)}else if(q=="p")tsp();else if(q=="b")bk();else if(q=="1")tab("t");else if(q=="2")gosp();else if(q=="3")tab("ob");else if(q=="4")gosk()});
+addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKey)return;const q=e.key.toLowerCase();if(q=="h")$("c").click();else if(q=="f")FS();else if(q=="z"){document.body.classList.toggle("fit");sc()}else if(q=="c")pal();else if(q=="[")sp=Math.min(2e3,sp*1.4),tm&&(stop(),play());else if(q=="]")sp=Math.max(150,sp/1.4),tm&&(stop(),play());else if(q=="m"){wm=!wm;nb();V&&load(V.n,V.ra,V.dec,V.z,2)}else if(q=="p")tsp();else if(q=="b")bk();else if(q=="x")$("dfb").click();else if(q=="y")$("stb").click();else if(q=="g")$("gab").click();else if(q=="i")$("wsb").click();else if(q=="1")tab("t");else if(q=="2")gosp();else if(q=="3")tab("ob");else if(q=="4")gosk()});
 // SPECTRUM: sample every loaded frame at the crosshair (view centre) (own WCS per frame), 3x3 median, plot vs wavelength
-const sm=(f,p)=>{const[a,b,c,d]=f.m,D=a*d-b*c;if(!D||!f.cr)return NaN;const[x0,y0,r0,d0]=f.cr,xi=((p.ra-r0+540)%360-180)*Math.cos(d0*Math.PI/180),et=p.dec-d0,
-  ix=Math.round(x0-1+(d*xi-b*et)/D),iy=Math.round(y0-1+(a*et-c*xi)/D),w=f.n,h=f.a.length/w;if(ix<1||iy<1||ix>w-2||iy>h-2)return NaN;
+const sm=(f,p)=>{const[a,b,c,d]=f.m,D=a*d-b*c;if(!D||!f.cr)return NaN;const[ix,iy]=s2p(f,p.ra,p.dec).map(Math.round),
+  w=f.n,h=f.a.length/w;if(ix<1||iy<1||ix>w-2||iy>h-2)return NaN;
   const v=[];for(let j=-1;j<2;j++)for(let i=-1;i<2;i++){const z=f.a[(iy+j)*w+ix+i];Number.isFinite(z)&&v.push(z)}return v.length<5?NaN:v.sort((x,y)=>x-y)[v.length>>1]},
 spd=()=>F.map((f,i)=>({f,i,x:(f.l0+(f.l1||f.l0))/2,y:sm(f,V)})).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map(p=>({...p,n:p.y-p.f.c.md,e:sgm(p.f)})).sort((a,b)=>a.x-b.x);
 // ICE DETECTOR. Per band: net flux = 3x3 median at the crosshair - field median; continuum = interpolation between flanking windows; depth = (continuum - band)/continuum; noise = robust (MAD) pixel scatter of each frame
-const sgm=f=>f.sg??(f.sg=(()=>{const v=f.a.filter(Number.isFinite).sort(),m=v[v.length>>1],d=v.map(x=>Math.abs(x-m)).sort();return d[d.length>>1]*1.4826||NaN})()),
+const sgm=f=>f.sg??(f.sg=(()=>{const va=f.q?.va;if(va){const s=Float32Array.from(va).filter(Number.isFinite).sort();return Math.sqrt(s[s.length>>1])||NaN}const v=f.a.filter(Number.isFinite).sort(),m=v[v.length>>1],d=v.map(x=>Math.abs(x-m)).sort();return d[d.length>>1]*1.4826||NaN})()),
 ICE=[{n:"H₂O",l:3.05,b:[2.8,3.3],c:[[2.55,2.75],[3.55,3.8]]},{n:"CO₂",l:4.27,b:[4.22,4.32],c:[[4,4.16],[4.38,4.55]]},{n:"CO",l:4.67,b:[4.64,4.7],c:[[4.5,4.6],[4.74,4.9]]}],
 ice=pt=>ICE.map(F=>{
   const sel=([a,b])=>pt.filter(p=>p.x>=a&&p.x<=b&&Number.isFinite(p.n)&&Number.isFinite(p.e)),B=sel(F.b),L=sel(F.c[0]),R=sel(F.c[1]);
@@ -390,7 +445,7 @@ function spec(){
 }
 const tab=t=>{document.body.dataset.tab=t;[...$("tb").children].forEach(b=>b.classList.toggle("on",b.dataset.t==t));spec()},
 gosp=()=>{tab("sp");if(!wm&&V){wm=1;nb();load(V.n,V.ra,V.dec,V.z,2)}},tsp=()=>document.body.dataset.tab=="sp"?tab("t"):gosp();
-// SKY: Aladin Lite all-sky map (WISE infrared), loaded on first use. Click anywhere -> SPHEREx cutouts + spectrum + ice scan for that spot
+// SKY: Aladin Lite all-sky map (DSS colour), loaded on first use. Click anywhere -> SPHEREx cutouts + spectrum + ice scan for that spot
 let al,alp,pp=[0,0];const ping=()=>{const p=$("pg");p.style.left=pp[0]+"px";p.style.top=pp[1]+"px";p.classList.remove("on");void p.offsetWidth;p.classList.add("on")};
 const aladin=()=>alp||(alp=(async()=>{
   // Aladin Lite v3 on jsDelivr is an ES module: load it with import() (a classic <script> throws "Unexpected token 'export'")
@@ -471,7 +526,7 @@ function tiles(t){
   tg.setTransform(q,0,0,q,0,0);tg.clearRect(0,0,w,h);
   if(sk()||!V)return;
   const f=F[k];let R;
-  if(f&&f.T){if(f.T.every(e=>e=="d"))return;const z0=f.q0,[tx,ty,B,s0]=TR;R=f.T.map((e,i)=>{const di=i%3-1,dj=(i/3|0)-1,x0=f.ox+di*z0.w,y0=f.H-(f.oy+dj*z0.h+z0.h);return[e,w/2+tx+B*s0*(x0-cv.width/2),h/2+ty+B*s0*(y0-cv.height/2),B*s0*z0.w,B*s0*z0.h]})}
+  if(f&&f.T){if(f.T.every(e=>e=="d"))return;const S=f.S,[tx,ty,B,s0]=TR;R=f.T.map((e,i)=>{const di=i%3-1,dj=(i/3|0)-1,x0=f.W/2+di*S-S/2,y0=f.H-(f.H/2+dj*S-S/2+S);return[e,w/2+tx+B*s0*(x0-cv.width/2),h/2+ty+B*s0*(y0-cv.height/2),B*s0*S,B*s0*S]})}
   else if(!F.length&&cv.width<=1){const S=Math.min(w,h)*.2;R=Array.from({length:9},(_,i)=>[i==4?"l":"q",w/2+(i%3-1.5)*S,h/2+((i/3|0)-1.5)*S,S,S])}
   else return;
   const A=getComputedStyle(document.body).getPropertyValue("--a").trim()||"#ffb000",p=.5+.5*Math.sin(t/180);
@@ -495,7 +550,7 @@ function hud(){
 const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="DISP "+n.toUpperCase();spec()};$("pal").onclick=pal;$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=innerWidth<1000;
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
-const mv=()=>{dirty=performance.now();co();sc();spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
+const mv=()=>{dirty=performance.now();co();sc();F[k]&&($("fg").textContent=flg(F[k]));spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
 addEventListener("keydown",e=>{if(e.target.tagName!="INPUT"&&!e.metaKey&&!e.ctrlKey){const q=e.key.toLowerCase();K.add(N[q]||q)}});
 addEventListener("keyup",e=>{const q=e.key.toLowerCase();K.delete(N[q]||q)});addEventListener("blur",()=>K.clear());
 const pn=(x,y)=>{const[a,b,c,d]=L.m;V.ra=(V.ra+(a*x-b*y)/Math.cos(V.dec*Math.PI/180)+360)%360;V.dec=Math.max(-89.9,Math.min(89.9,V.dec+c*x-d*y));mv()},
@@ -519,12 +574,16 @@ requestAnimationFrame(function tick(t){
     const tx=-(d*u-b*w)/D*s,ty=(a*w-c*u)/D*s;cv.style.transform=`translate(${tx}px,${ty}px) scale(${L.z/V.z})`;TR=[tx,ty,L.z/V.z,Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height)];
   }
   hud();
-  tiles(t);if(dirty&&!bz&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
+  tiles(t);ovl();if(dirty&&!bz&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
   requestAnimationFrame(tick)
 });
 addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
-load(...T[0]).then(async()=>{for(const[,r,d]of T.slice(1)){while(bz)await new Promise(r=>setTimeout(r,2e3));await pre(r,d)}});
+{ // URL params: ?ra=&dec= (deg or sexagesimal) | ?q=name &fov=0.25 &mode=blink|spec &diff=1 &embed=1
+  const Q=new URLSearchParams(location.search),c=Q.get("ra")&&Q.get("dec")?sx(Q.get("ra")+" "+Q.get("dec")):0,md=Q.get("mode"),z=Math.min(1,Math.max(.03,+Q.get("fov")||.25));
+  wm=md=="spec";stk=!!Q.get("stack");OV.g=!!Q.get("gaia");OV.w=!!Q.get("wise");bl=md=="blink"||stk&&!wm;["stb","gab","wsb"].forEach((i,j)=>$(i).classList.toggle("on",!![stk,OV.g,OV.w][j]));bl&&(sp=450,$("bk").classList.add("on"),document.body.classList.add("blk"));wm&&tab("sp");Q.get("diff")&&$("dfb").click();Q.get("embed")&&document.body.classList.add("hide");
+  if(Q.get("q")){$("q").value=Q.get("q");$("f").requestSubmit()}else if(c)load("Custom",c[0],c[1],z);
+  else load(...T[0]).then(async()=>{for(const[,r,d]of T.slice(1)){while(bz)await new Promise(r=>setTimeout(r,2e3));await pre(r,d)}})}
 </script>
 <script src="targets.js"></script><script src="catalog.js"></script>
 </body>
