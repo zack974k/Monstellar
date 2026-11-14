@@ -80,6 +80,8 @@ dt{font:600 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color
 kbd{font:inherit;border:1px solid var(--ln);padding:0 5px;margin-right:3px;color:var(--a)}
 #s{position:fixed;left:50%;bottom:116px;transform:translateX(-50%);z-index:3;padding:5px 16px;border-left:3px solid var(--a);background:rgba(0,0,0,.65);font:600 12px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--a);text-align:center;max-width:90%}
 #s.err{color:var(--er);border-left-color:var(--er)}#s.ld{bottom:auto;top:calc(50% + 96px);font-size:15px;padding:10px 22px;background:rgba(0,0,0,.75)}#s.ld::before{content:"";display:block;height:2px;margin:0 -22px 9px;background:linear-gradient(90deg,transparent,var(--a),transparent) no-repeat;background-size:50% 100%;animation:ldb 1.2s linear infinite}#s.ld::after{content:" · " attr(data-e)}@keyframes ldb{from{background-position:-50% 0}to{background-position:150% 0}}
+#slots{position:fixed;left:50%;top:calc(50% + 150px);transform:translateX(-50%);display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:90vw;z-index:3;pointer-events:none}#slots i{position:relative;overflow:hidden;width:66px;height:42px;display:grid;place-items:center;font:700 11px var(--disp);font-style:normal;letter-spacing:.12em;color:var(--lb);background:rgba(3,4,3,.7);box-shadow:inset 0 0 0 1px var(--ln)}#slots i.l{color:var(--a);box-shadow:inset 0 0 0 1px var(--a)}#slots i.l::before{content:"";position:absolute;left:0;right:0;height:14px;background:linear-gradient(transparent,color-mix(in srgb,var(--a) 60%,transparent),transparent);animation:tsw .8s linear infinite}#slots i.d{background:var(--a);color:#000}#slots i.x{background:var(--er);color:#000}@keyframes tsw{from{top:-14px}to{top:100%}}
+#lsw{position:fixed;inset:0;z-index:1;pointer-events:none;display:none;overflow:hidden}body.ldg #lsw{display:block}#lsw::before{content:"";position:absolute;left:0;right:0;top:0;height:22vh;background:linear-gradient(transparent,color-mix(in srgb,var(--a) 22%,transparent) 85%,var(--a));opacity:.55;animation:lsw 1.6s ease-in-out infinite}@keyframes lsw{from{transform:translateY(-22vh)}to{transform:translateY(100vh)}}
 #ak{position:fixed;inset:0;z-index:1;display:none;background:#000}
 body[data-tab=sk] #ak{display:block}
 body[data-tab=sk] #c,body[data-tab=sk] #hd,body[data-tab=sk] .ctl{visibility:hidden}
@@ -136,10 +138,10 @@ body[data-tab=sk] #sr{display:block}
 <body data-p="amb" data-tab="t">
 <img id="bg" alt=""><canvas id="c" width="1" height="1"></canvas>
 <div id="ak"></div>
-<div id="fx" class="ui"></div>
+<div id="fx" class="ui"></div><div id="lsw"></div>
 <canvas id="hd" class="ui"></canvas>
 <svg class="hud" viewBox="-64 -64 128 128" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M-30-14V-30H-14M14-30H30V-14M30 14V30H14M-14 30H-30V14" stroke-width="2.2"/><path d="M0-62V-40M0 40V62M-62 0H-40M40 0H62" stroke-opacity=".7"/><path d="M-8 0h5M3 0h5M0-8v5M0 3v5"/><path d="M-52-3v6M-46-2v4M52-3v6M46-2v4M-3-52h6M-2-46h4M-3 52h6M-2 46h4" stroke-opacity=".6"/></svg>
-<div id="s">Select a target</div>
+<div id="s">Select a target</div><div id="slots" class="ui"></div>
 <div id="pg" class="ui"></div>
 <div id="bl" class="ui pnl"></div>
 <div id="lg" class="ui pnl"><h2>Cmd log</h2><div class="pb"><div id="lo"></div></div></div>
@@ -193,7 +195,7 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
   if(C.size>250)C.delete(C.keys().next().value)})().finally(()=>FL.delete(u));FL.set(u,p)}
   await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}else lg("MEM",`${kd} from memory\n    ${u}`,"r");
   if(sg.aborted)throw AE();return C.get(u)};
-const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=12,sk=()=>document.body.dataset.tab=="sk";
+const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=2,sk=()=>document.body.dataset.tab=="sk";
 // spectrum mode: instead of an even spread, take the exposures nearest a wavelength ladder that is dense around the H2O / CO2 / CO ice bands
 const LAD=[.8,1.2,1.6,2,2.4,2.6,2.7,2.8,2.9,3,3.1,3.2,3.35,3.6,3.75,4.05,4.15,4.22,4.27,4.32,4.4,4.5,4.58,4.64,4.67,4.7,4.8,4.9],
 ladder=(R,w,wx)=>{const m=r=>(+r[w]+ +r[wx])/2*1e6,used=new Set,o=[];for(const l of LAD){let b=-1,bd=1e9;R.forEach((r,i)=>{const d=Math.abs(m(r)-l);if(!used.has(i)&&d<bd){bd=d;b=i}});if(b>=0&&bd<.06){used.add(b);o.push(R[b])}}return o.length>1?o:R.slice(0,12)};
@@ -252,7 +254,7 @@ nb=()=>{bl=0;sp=700;$("bk").classList.remove("on");document.body.classList.remov
 bk=()=>{bl=!bl;if(bl){wm=0;sp=450;tab("t");$("bk").classList.add("on");document.body.classList.add("blk")}else nb();V&&load(V.n,V.ra,V.dec,V.z,2)};
 
 async function load(n,ra,dec,z=.25,keep){
-  !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();ac=new AbortController;const sg=ac.signal;bz=1;
+  !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();$("slots").innerHTML="";document.body.classList.add("ldg");ac=new AbortController;const sg=ac.signal;bz=1;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
   V={n,ra,dec,z};$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
@@ -265,28 +267,28 @@ async function load(n,ra,dec,z=.25,keep){
     if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
     $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
-    lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
+    lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);$("slots").innerHTML=S.map(r=>"<i>"+(+r[w]*1e6).toFixed(2)+" µm</i>").join("");W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
     const res=Array(S.length);let nx=0,dn=0;st(`Loading images 0 of ${S.length}…`);
     const one=async j=>{
-      const r=S[j],B=$("tl").children[j];B.classList.add("cur");
+      const r=S[j],B=$("tl").children[j],sl=$("slots").children[j];B.classList.add("cur");sl&&(sl.className="l");
       try{
         const b=await G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=${z}`,sg,0,keep!=1);if(sg.aborted)return;
         const q=fits(b),m=+r[t],f={c:paint(q),m:q.m,a:q.a,n:q.w,cr:q.cr,u:q.u,l0:+r[w]*1e6,l1:+r[wx]*1e6,t:m,d:iso(m),w:+r[w]?(r[w]*1e6).toFixed(2):""},
         cu=fl?f:F[k];res[j]=f;F=res.filter(Boolean);
         [...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
-        B.className="tk";B.title=`${f.d} · ${f.w} µm`;
+        B.className="tk";sl&&(sl.className="d");B.title=`${f.d} · ${f.w} µm`;
         lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
-      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
+      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";sl&&(sl.className="x");B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
       st(`Loading images ${++dn} of ${S.length}…`);
     };
-    await Promise.all(S.map((_,j)=>one(j)));
+    await Promise.all(Array.from({length:Math.min(CONC,S.length)},async()=>{while(nx<S.length)await one(nx++)}));
     if(!F.length)return st("No usable images came back from IRSA",1);
     st("");bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
     st(PROXY?"Couldn’t reach NASA IRSA through the proxy":"Browser blocked NASA IRSA (no CORS). Set PROXY in index.html",1);
-  }finally{if(sg==ac.signal)bz=0}
+  }finally{if(sg==ac.signal){bz=0;$("slots").innerHTML="";document.body.classList.remove("ldg")}}
 }
 
 T.forEach(([n,ra,dec],i)=>{const b=document.createElement("button");b.dataset.n=n;b.style.setProperty("--i",i);b.title=`RA ${ra}° Dec ${dec}°`;b.innerHTML=`${p2(i+1)}<span>${n}</span><small>${ra}° ${dec>0?"+":""}${dec}°</small>`;b.onclick=()=>load(n,ra,dec);b.onpointerenter=()=>warm(ra,dec);$("nav").append(b)});
