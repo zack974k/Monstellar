@@ -198,7 +198,7 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
       lg("RX",`HTTP ${r.status} ${r.statusText} · ${ct}${src?" [src "+src+"]":""} · headers in ${ms()}`,r.ok?"r":"e");
       if(!r.ok){
         const body=(await r.text()).slice(0,500);
-        const err=Error(`HTTP ${r.status}${src?" [src "+src+"]":""}${body?" · "+body.replace(/\\s+/g," ").trim():""}`);
+        const err=Error(`HTTP ${r.status}${src?" [src "+src+"]":""}${body?" · "+body.replace(/\s+/g," ").trim():""}`);
         err.status=r.status;err.retryAfter=r.headers.get("retry-after");
         throw err;
       }
