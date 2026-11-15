@@ -1,0 +1,81 @@
+MONSTELLAR PROGRESS (OYUN TECH, 2026-11-15)
+Plan: claude workspace/workspace/monstellar/plan.md (item numbers A1-A50, F1-F16 refer to it)
+Style: rough prototype on purpose (owner asked). Compact edits, only index.html changed.
+Git commits (local only, NOTHING pushed, NOTHING deployed):
+  a91e2ea pre-phase1 snapshot
+  914a140 phase1 rough: colormap LUT, diverging diff, overlay colors, remove FX/filters
+  d7b1634 phase2 rough: flag mask, live wavelength, shared blink scale, diff warning, ice wording, no-targets msg
+Rollback: git revert <hash>, or git reset to a91e2ea.
+
+OWNER DECISIONS
+- Image data default: colormap (inferno), not grayscale.
+- Delete the dead mosaic code (not done yet, Phase 3 / A27).
+- No custom domain for the Worker.
+- Skip MPC astrometry export.
+- Weekly GitHub re-bake: later.
+- If a target has no coverage: just say "no targets found" (no replacement demo target).
+
+TESTING STATUS
+- Only a JavaScript syntax check (node --check) was run after each phase: passed.
+- NOT opened in a browser. NOT visually checked. No screenshots. No Playwright. Not tested with live IRSA/VizieR data.
+- Treat everything below as "written, not verified". Open the page and try it.
+
+DONE - PHASE 1 COLOR (rough)
+- A1  Removed the CSS hue filters on the main image and the Sky tab. Image now uses a real colormap in paint(). New MAP button cycles inferno / viridis / ice / gray. All frames repaint on change.
+- A3  Pixels with no data (NaN) are painted dark purple instead of black.
+- A4  Diff and Stack-with-Diff use a diverging scale (cyan - black - orange).
+- A5  Overlay colors: Gaia cyan, WISE magenta, each with a black halo. (No on-screen legend yet.)
+- A7  Background DSS placeholder image made grayscale.
+- A8  Ice "EXCESS" row is cyan (--wr). Red is now only for errors.
+- A10 Label color contrast raised (--lb 68% -> 85%). Not measured against WCAG.
+- A11 Removed scanlines, vignette, sweeping glow and mouse glow over the image.
+- A13 Palette button renamed "UI <color>" (accent only); new "MAP <name>" button for the image colormap.
+- A9 (partial) Active toggle buttons show a filled dot before the label.
+
+DONE - PHASE 2 CORRECTNESS (rough)
+- F12 Bad-pixel masking: pixels with unusable quality flags become NaN when a frame loads (fits()). Flag bits used: 1,2,6,9,10,11,15,19 (OVERFLOW, SUR_ERROR, NONFUNC, MISSING, HOT, COLD, NONLINEAR, OUTLIER). ASSUMPTION: bit meanings taken from the existing FN table, NOT checked against the IRSA SPHEREx docs. Always on, no toggle, no hatched overlay.
+- A15 Spectrum wavelength now read per frame at the crosshair position (was fixed at load time).
+- A18 Blink frames share one brightness scale (union of per-frame percentiles) after loading.
+- A19 Turning Diff on in non-Blink mode shows a 4 second warning: DIFF ACROSS BANDS IS NOT MEANINGFUL.
+- A17 (partial) Ice wording changed to "ICE-BAND DIP CANDIDATE" / "NO ICE-BAND DIP SEEN" / DIP / NO DIP. CO2 right continuum window narrowed to 4.38-4.42 um so it does not cross the 4.42 um detector boundary (may show NO COVERAGE more often).
+- A21 (partial) No scans / no usable images now says "No targets found: ..." (no replacement target, as decided).
+
+NOT DONE - PHASE 1 LEFTOVERS
+- A2  Wavelength has no color (interim tinted labels). Real fix = F5 false-color composite.
+- A6  Sky tab fallback chart check.
+- A9  aria-pressed on toggles, text prefixes on ice rows.
+- A12 Colorbar with numeric lo/hi and units, stretch selector (linear/asinh/log), LOCK SCALE toggle (scale is currently always locked in Blink).
+- A5  Small legend for overlay colors.
+- A10 WCAG contrast measurement, 12px minimum labels.
+
+NOT DONE - PHASE 2 LEFTOVERS
+- A14 Proper-motion correction per target (needs real Gaia/CatWISE numbers, not from memory). Gaia/WISE overlays already move stars to each frame's date.
+- A16 Real aperture photometry (would change units used by the ice readout and spectrum plot; needs care).
+- A17 Rest: use real photometry noise, warn when band frames span many days (variable source).
+- A20 CatWISE overlay, raising the 300-source cap.
+- A21 Rest: re-run IRSA SIA query by hand for WISE 0855 to see if QR3 covers it.
+- A22 DETECTOR stack mode (6 deep broadband images).
+- F12 Rest: MASK BAD toggle and hatched overlay per flag family; confirm flag bits in IRSA docs.
+
+NOT DONE - PHASE 3 BUGS (next up)
+- A23 Wheel over catalog/log/help panel zooms the image.
+- A24 ?gaia=0 etc. turn features ON.
+- A25 Bad URL coordinates silently ignored.
+- A26 hms()/dms() can print 60.0s / 60".
+- A27 Delete dead mosaic code (owner said delete): mos, plc, put, rep, f.fill, ts, f.T branch in tiles(), bk variable in one(), tel. Keep the loading placeholder branch.
+- A28-A32 bake.mjs resumable, worker error handling, empty-result caching, FITS BSCALE/BZERO, MAXREC cap warning.
+- A48-A50 catalog.js row numbers, README "5 featured" -> 8, URL precision.
+
+NOT DONE - PHASE 4 MOBILE/UX
+- A38-A47 mobile coordinate box (biggest one), jargon rename, hide log by default, first view = Blink on Barnard's Star, per-mode frame cache, naming, short-screen overflow, shortcut help overlay, accessibility, cutout reload on pan, Web Worker for heavy loops.
+
+NOT DONE - DATA / DEPLOY (A33-A37)
+- Baked data vs network freshness, collection constant, proxy origin allowlist, hardcoded Worker host. Nothing deployed.
+
+NOT DONE - PHASE 5 WOW FEATURES
+- F5 false-color composite (planned first), F8 time machine, F1 solar-system mode, F2 shift-and-stack, F6 click-any-source spectrum, F13 export video/share card/embed, F16 motion sonification, then F3, F4, F9, F10, F11, F14, F15, F7.
+
+THINGS TO WATCH
+- plan.md and progress.txt are not listed in .assetsignore, so "npx wrangler deploy" would publish them as public files. Add them to .assetsignore before deploying (not done: nobody asked for that edit yet).
+- Do NOT run "npx wrangler deploy" or git push without the owner's OK.
+- Old hint in plan.md about the Worker cache: Cache API is probably a no-op on *.workers.dev.
