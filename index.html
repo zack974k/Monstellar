@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#000">
+<meta name="theme-color" content="#000"><link rel="icon" href="data:,">
 <link rel="preconnect" href="https://monstellar.gundegmaamunxjargal.workers.dev" crossorigin>
 <title>Monstellar · SPHEREx Control</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,9 +29,9 @@ body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .pnl{background:linear-gradient(var(--a),var(--a)) 0 0/16px 2px,linear-gradient(var(--a),var(--a)) 0 0/2px 16px,linear-gradient(var(--a),var(--a)) 100% 0/16px 2px,linear-gradient(var(--a),var(--a)) 100% 0/2px 16px,linear-gradient(var(--a),var(--a)) 0 100%/16px 2px,linear-gradient(var(--a),var(--a)) 0 100%/2px 16px,linear-gradient(var(--a),var(--a)) 100% 100%/16px 2px,linear-gradient(var(--a),var(--a)) 100% 100%/2px 16px,rgba(3,4,3,.62);background-repeat:no-repeat;box-shadow:inset 0 0 0 1px var(--ln);backdrop-filter:blur(3px)}
 .pnl h2{position:absolute;left:14px;top:-9px;padding:0 12px 0 8px;background:var(--a);color:#000;font:700 11px/16px var(--disp);letter-spacing:.24em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 .pb{padding:18px 14px 12px}
-.brand{left:16px;top:10px;padding-left:10px;border-left:3px solid var(--a)}
+#top{left:16px;right:16px;top:10px;display:flex;align-items:flex-start;gap:16px;pointer-events:none}#top>*{pointer-events:auto}.brand{flex:none;padding-left:10px;border-left:3px solid var(--a)}
 .brand b{display:block;font:700 22px/1 var(--disp);letter-spacing:.32em}.brand span{font:600 10px var(--disp);letter-spacing:.24em;text-transform:uppercase;color:var(--lb)}
-.tools{right:16px;top:12px;display:flex;align-items:center;gap:14px}
+.tools{margin:2px 0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:14px;min-width:0;overflow:hidden}
 .lk{display:flex;align-items:center;gap:8px;font:600 11px var(--disp);letter-spacing:.22em;color:var(--a);white-space:nowrap}
 .lk::before{content:"";width:8px;height:8px;background:currentColor;animation:pu 2s ease-in-out infinite}
 .lk.busy::before{animation:bl .8s steps(2) infinite}.lk.err{color:var(--er)}
@@ -41,7 +41,7 @@ body.hide .ui,body.hide #s{opacity:0;pointer-events:none}
 .chip:hover,#pl:hover:not(:disabled),#pv:hover:not(:disabled),#nx:hover:not(:disabled){background:var(--a);color:#000}
 .ic{width:26px;height:26px;display:grid;place-items:center;color:var(--a)}
 #lc,#gt{display:flex;flex-direction:column;gap:22px}#lc{left:16px;top:84px;width:340px;max-height:calc(100vh - 214px);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent}#lc>*,#gt>*{position:relative;inset:auto}#lc{pointer-events:none}#lc>*,#gt>*{pointer-events:auto}#gt{pointer-events:none}
-.tabs{left:50%;top:10px;transform:translateX(-50%);display:flex;gap:2px}.tabs button{height:26px;padding:0 18px;font:700 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-bottom:2px solid transparent}.tabs button:hover{background:color-mix(in srgb,var(--a) 18%,transparent);color:var(--ink)}.tabs button.on{background:var(--a);color:#000}
+.tabs{flex:none;display:flex;gap:2px}.tabs button{height:26px;padding:0 18px;font:700 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-bottom:2px solid transparent}.tabs button:hover{background:color-mix(in srgb,var(--a) 18%,transparent);color:var(--ink)}.tabs button.on{background:var(--a);color:#000}
 body[data-tab=t] #sp,body[data-tab=t] #ob,body[data-tab=sp] #gt,body[data-tab=sp] #ob,body[data-tab=ob] #gt,body[data-tab=ob] #sp{display:none}
 #nav{display:flex;flex-direction:column;gap:2px}
 #nav button{height:30px;display:flex;align-items:center;gap:12px;padding:0 12px;text-align:left;font:600 13px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:background .15s,transform .15s}
@@ -68,7 +68,7 @@ dt{font:600 11px var(--disp);letter-spacing:.22em;text-transform:uppercase;color
 .ctl>button:disabled{opacity:.3;cursor:default}
 #pv,#nx{font-size:18px;line-height:1;padding:0 12px}#pl{min-width:84px}
 #t0,#t1{font-size:12px;color:var(--lb)}
-#tl{position:relative;flex:1;height:24px}
+#tl{position:relative;flex:1;height:24px;min-width:60px}
 #tl::before{content:"";position:absolute;left:0;right:0;bottom:6px;height:1px;background:var(--ln)}
 .tk{position:absolute;bottom:0;width:16px;height:24px;transform:translateX(-50%);display:flex;align-items:flex-end;justify-content:center}
 .tk i{width:1px;height:var(--h);margin-bottom:6px;background:var(--lb)}
@@ -109,7 +109,7 @@ body[data-tab=sk] #sr{display:block}
 .in{margin-top:8px;font-size:10px;line-height:1.35;color:var(--lb);opacity:.8}
 /* motion */
 .ui{animation:boot .8s backwards}
-.brand{animation-delay:.05s}.tabs{animation-delay:.15s}.tools{animation-delay:.25s}.ctl{animation-delay:.5s}.keys{animation-delay:.7s}
+#top{animation-delay:.05s}.ctl{animation-delay:.5s}.keys{animation-delay:.7s}
 @keyframes boot{from{opacity:0;filter:blur(8px) brightness(2.5)}}
 #lc>*,#nav button{animation:slide .5s cubic-bezier(.2,.8,.2,1) backwards}
 #lc>#gt{animation-delay:.3s}#nav button{animation-delay:calc(.3s + var(--i,0)*45ms)}
@@ -120,9 +120,12 @@ body[data-tab=sk] #sr{display:block}
 @keyframes pu{50%{opacity:.3}}
 #c.fl{animation:fl .3s ease-out}@keyframes fl{from{opacity:.35}}
 @media(prefers-reduced-motion:reduce){*,::before,::after{animation:none!important}}
+@media(max-width:1460px){#utc{display:none}.tools{gap:8px}.chip{padding:0 8px;letter-spacing:.14em}.tabs button{padding:0 12px}}
+@media(max-width:1300px){#t0,#t1{display:none}}
+@media(max-width:1180px){#kb,#pal{display:none}.brand span{display:none}}
 @media(max-width:1000px){
   .brand span,#utc,.keys{display:none}.brand b{font-size:14px;letter-spacing:.2em}.lk{font-size:0}#kb{display:none}.tools{gap:8px}
-  .tabs{left:10px;top:42px;transform:none}#lc{top:80px;left:10px;right:10px;width:auto;max-height:calc(100vh - 170px)}#gt{gap:10px}#nav{flex-direction:row;overflow:auto;scrollbar-width:none}#nav button{flex:none;padding:0 12px}
+  #top{left:10px;right:10px;flex-wrap:wrap;gap:6px 8px}.tabs{order:3;flex:1 0 100%}.tools{flex:1 1 0;overflow-x:auto;scrollbar-width:none;justify-content:flex-start;margin:0}#lc{top:80px;left:10px;right:10px;width:auto;max-height:calc(100vh - 170px)}#gt{gap:10px}#nav{flex-direction:row;overflow:auto;scrollbar-width:none}#nav button{flex:none;padding:0 12px}
   #f{order:-1;padding:6px 10px}#f::before{font-size:11px}#f input{font-size:16px}
   #tt{font-size:16px}#wl{font-size:26px;min-height:26px}.sc{flex-direction:column;align-items:flex-start}.sc>div{align-items:flex-start}
   .ctl{left:10px;right:10px;bottom:10px;gap:6px;overflow-x:auto}.ctl>button{padding:0 9px;flex:none}#tl{min-width:70px}#t0,#t1{display:none}#s{bottom:76px}
@@ -135,7 +138,7 @@ body[data-tab=sk] #sr{display:block}
 <div id="fx" class="ui"></div><div id="lsw"></div>
 <canvas id="to" class="ui"></canvas><canvas id="hd" class="ui"></canvas>
 <svg class="hud" viewBox="-64 -64 128 128" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M-30-14V-30H-14M14-30H30V-14M30 14V30H14M-14 30H-30V14" stroke-width="2.2"/><path d="M0-62V-40M0 40V62M-62 0H-40M40 0H62" stroke-opacity=".7"/><path d="M-8 0h5M3 0h5M0-8v5M0 3v5"/><path d="M-52-3v6M-46-2v4M52-3v6M46-2v4M-3-52h6M-2-46h4M-3 52h6M-2 46h4" stroke-opacity=".6"/></svg>
-<div id="s">Select a target</div><div id="slots" class="ui"></div>
+<div id="s">Select a target</div>
 <div id="pg" class="ui"></div>
 <div id="bl" class="ui pnl"></div>
 <div id="lg" class="ui pnl"><h2>Log</h2><div class="pb"><div id="lo"></div></div></div>
@@ -143,10 +146,11 @@ body[data-tab=sk] #sr{display:block}
 <div id="hp" class="ui pnl" hidden><h2>How to read this</h2><div class="pb"><p><b>What is this?</b> SPHEREx is a NASA space telescope photographing the whole sky in infrared light, split into about 100 colours. This page shows its real images of one spot of sky.</p><p><b>1 · Pick a target</b> on the left (or type coordinates / a name in the GO TO box). Images come from NASA's archive, which can take a minute.</p><p><b>2 · Step through the images</b> with ‹ › or Play. Each one is the same spot at a different colour (µm) and date, shown at the bottom.</p><p><b>3 · Open the Spectrum tab</b> (top, or press 2): brightness at the crosshair for each colour. Dips at 3.05, 4.27 and 4.67 µm mean ice (water, CO₂, CO), where planets and comets form.</p><ul><li><b>Blink</b> flips between dates to spot things that move or change</li><li><b>Diff</b> subtracts the previous image</li><li><b>Gaia / WISE</b> mark known stars and infrared sources</li><li><b>Sky</b> tab: click anywhere on the map to look there</li></ul><button class="chip" id="hx">GOT IT</button></div></div>
 <div id="kp" class="ui pnl" hidden><h2>Keyboard</h2><div class="pb"><dl><dt>W A S D</dt><dd>Move the view</dd><dt>+ / − / wheel</dt><dd>Zoom</dd><dt>Space</dt><dd>Play / pause</dd><dt>← →</dt><dd>Previous / next frame</dd><dt>[ ]</dt><dd>Slower / faster playback</dd><dt>1 2 3 4</dt><dd>Tabs: Target, Spectrum, Frame info, Sky</dd><dt>B</dt><dd>Blink same-colour frames across dates</dd><dt>X</dt><dd>Diff against previous frame (or reference)</dd><dt>R</dt><dd>Pin / unpin reference frame</dd><dt>Y / U</dt><dd>Stack / stack method</dd><dt>G / I</dt><dd>Gaia / WISE sources</dd><dt>M / P</dt><dd>Spectrum mode (frames in wavelength order) / spectrum panel</dd><dt>Z</dt><dd>Fit image to screen</dd><dt>C</dt><dd>Interface colour</dd><dt>H</dt><dd>Hide interface</dd><dt>F</dt><dd>Fullscreen</dd><dt>?</dt><dd>This list</dd></dl><button class="chip" id="kx">CLOSE</button></div></div>
 <div id="sr" class="ui pnl">SKY MAP · CLICK ANYWHERE TO LOAD SPHEREx</div>
-<div class="ui brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
-<div class="ui tabs" id="tb"><button class="on" data-t="t" title="Pick a target and browse its images">Target</button><button data-t="sp" title="Brightness vs colour, with ice detection">Spectrum</button><button data-t="ob" title="Colour, date and quality of the current image">Frame info</button><button data-t="sk" title="All-sky map: click anywhere to look there">Sky</button></div>
-<div class="ui tools"><span id="lk" class="lk">DATA OK</span><span id="utc"></span><button class="chip" id="hlp">? HELP</button><button class="chip" id="kb" title="Keyboard shortcuts (?)">KEYS</button><button class="chip" id="lgb">LOG</button><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Interface accent color (C)">UI AMB</button><button class="chip" id="cmb" title="Image colormap: how brightness is colored">MAP INFERNO</button>
+<div id="top" class="ui"><div class="brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
+<div class="tabs" id="tb"><button class="on" data-t="t" title="Pick a target and browse its images">Target</button><button data-t="sp" title="Brightness vs colour, with ice detection">Spectrum</button><button data-t="ob" title="Colour, date and quality of the current image">Frame info</button><button data-t="sk" title="All-sky map: click anywhere to look there">Sky</button></div>
+<div class="tools"><span id="lk" class="lk">DATA OK</span><span id="utc"></span><button class="chip" id="hlp">? HELP</button><button class="chip" id="kb" title="Keyboard shortcuts (?)">KEYS</button><button class="chip" id="lgb">LOG</button><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Interface accent color (C)">UI AMB</button><button class="chip" id="cmb" title="Image colormap: how brightness is colored">MAP INFERNO</button>
   <button class="ic" id="fs" title="Fullscreen (F) · all shortcuts (?)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
+</div>
 <div id="lc" class="ui">
 <div id="gt">
 <nav id="nav" class="ui"></nav>
@@ -189,7 +193,7 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
   else if(await M0,M[u]){C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());lg("BAKE",`${kd} from pre-baked ${M[u]} · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}`,"r")}
   else{for(let n=0;;n++){const t0=performance.now(),ms=()=>Math.round(performance.now()-t0)+" ms";try{lg("TX",`GET ${u}\n    via ${PROXY||"direct"} · try ${n+1} · timeout ${tx?30:90}s`);const r=await fetch(P(u),{signal:AbortSignal.timeout(tx?3e4:9e4)});lg("RX",`HTTP ${r.status} ${r.statusText} · ${r.headers.get("content-type")||"?"}${r.headers.get("x-src")?" [src "+r.headers.get("x-src")+"]":""} · headers in ${ms()}`,r.ok?"r":"e");if(!r.ok)throw Error("HTTP "+r.status);C.set(u,await r[tx?"text":"arrayBuffer"]());lg("RX",`${kd} body ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"} complete in ${ms()}`,"r");break}catch(e){lg("ERR",`${e.message||e.name} after ${ms()}${n>2?" · giving up":" · retrying"}`,"e");if(n>2)throw e;await new Promise(r=>setTimeout(r,400*(n+1)))}}
     ch&&ch.put(u,new Response(tx?C.get(u):C.get(u).slice(0),{headers:{"x-t":Date.now()}})).catch(()=>0)}
-  if(C.size>250)C.delete(C.keys().next().value)})().finally(()=>FL.delete(u));FL.set(u,p)}
+  if(C.size>80)C.delete(C.keys().next().value)})().finally(()=>FL.delete(u));FL.set(u,p)}
   await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}else lg("MEM",`${kd} from memory\n    ${u}`,"r");
   if(sg.aborted)throw AE();return C.get(u)};
 const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=new DOMParser().parseFromString(await G(SIA(ra,dec),new AbortController().signal,1,1),"text/xml"),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[t]-b[t]);await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,warm=(ra,dec)=>G(SIA(ra,dec),new AbortController().signal,1,1).catch(()=>0),CONC=8,sk=()=>document.body.dataset.tab=="sk";
@@ -208,20 +212,21 @@ FN={0:"TRANSIENT",1:"OVERFLOW",2:"SUR_ERROR",6:"NONFUNC",7:"DICHROIC",9:"MISSING
 // quality bits OR-ed over the 3x3 pixels at the crosshair (SOURCE/FULLSAMPLE/PHANMISS are informational, not listed)
 flg=f=>{if(!f.fg)return"n/a";const w=f.n,h=f.fg.length/w,[x,y]=s2p(f,V.ra,V.dec).map(Math.round);let m=0,c=0;for(let j=-1;j<2;j++)for(let i=-1;i<2;i++){const X=x+i,Y=y+j,v=X>=0&&Y>=0&&X<w&&Y<h?f.fg[Y*w+X]:-1;v>=0&&(m|=v,c++)}if(!c)return"n/a";const n=Object.keys(FN).filter(b=>m>>b&1).map(b=>FN[b]);return n.length?n.join(" "):"CLEAR"},
 // DIFF: this frame minus the previous one, resampled onto this frame's grid through both WCSs (same-band frames only make physical sense)
-dc=()=>{const f=F[k],g=ref(f);if(stk){const s=sdc(f);if(s)return s}if(!df||!g||g===f)return f.c;if(f.dg!==g){const w=f.n,h=f.a.length/w,gw=g.n,gh=g.a.length/gw,o=new Float32Array(f.a.length);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[r,d]=p2s(f,x,y),[gx,gy]=s2p(g,r,d),i=Math.round(gx),j=Math.round(gy);o[y*w+x]=f.a[y*w+x]-f.c.md-((i>=0&&j>=0&&i<gw&&j<gh?g.a[j*gw+i]:NaN)-g.c.md)}f.dg=g;f.dc=paint({w,h,a:o,div:1})}return f.dc};
+dc=()=>{const f=F[k],g=ref(f);if(stk){const s=sdc(f);if(s)return s}if(!df||!g||g===f)return f.c;if(f.dg!==g){const w=f.n,h=f.a.length/w,gw=g.n,gh=g.a.length/gw,o=new Float32Array(f.a.length),mp=rs(f,g);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[gx,gy]=mp(x,y),i=Math.round(gx),j=Math.round(gy);o[y*w+x]=f.a[y*w+x]-f.c.md-((i>=0&&j>=0&&i<gw&&j<gh?g.a[j*gw+i]:NaN)-g.c.md)}f.dg=g;f.dc=paint({w,h,a:o,div:1,ms:5*Math.hypot(sgm(f),sgm(g))})}return f.dc};
 $("dfb").onclick=()=>{df=!df;$("dfb").classList.toggle("on",df);df&&!bl&&(st("DIFF ACROSS BANDS IS NOT MEANINGFUL · PRESS B FOR BLINK"),setTimeout(()=>!bz&&st(""),4000));F.length&&show(k)};
 // SIP distortion polynomial (A/B terms, pixel offsets from CRPIX); s2p inverts it by fixed-point iteration
 const spf=(L,u,v)=>{let s=0;for(const[p,q,c]of L)s+=c*u**p*v**q;return s},
 // Diff reference: the pinned frame (matched by MJD so it survives reloads), else the previous frame
-ref=f=>{const g=dr&&F.find(x=>x.t===dr);return g||F[F.indexOf(f)-1]},
+rs=(f,g)=>{const w=f.n,h=f.a.length/w,S=8,nx=Math.max(1,Math.ceil((w-1)/S)),ny=Math.max(1,Math.ceil((h-1)/S)),P=[];for(let j=0;j<=ny;j++)for(let i=0;i<=nx;i++){const[r,d]=p2s(f,i*(w-1)/nx,j*(h-1)/ny);P.push(s2p(g,r,d))}return(x,y)=>{const u=x*nx/(w-1||1),v=y*ny/(h-1||1),i=Math.min(nx-1,u|0),j=Math.min(ny-1,v|0),a=u-i,b=v-j,p=P[j*(nx+1)+i],q=P[j*(nx+1)+i+1],r=P[(j+1)*(nx+1)+i],s=P[(j+1)*(nx+1)+i+1],l=(c,d)=>(1-b)*((1-a)*c+a*d);return[l(p[0],q[0])+b*((1-a)*r[0]+a*s[0]),l(p[1],q[1])+b*((1-a)*r[1]+a*s[1])]}},
+ref=f=>{const g=dr&&F.find(x=>x.t===dr);if(g)return g;const o=F.filter(x=>x!==f&&Math.abs(x.w-f.w)<.05).sort((a,b)=>Math.abs(a.w-f.w)-Math.abs(b.w-f.w)||Math.abs(a.t-f.t)-Math.abs(b.t-f.t));return o[0]},
 // STACK: per-pixel median of the other frames in the same band (each SPHEREx detector has its own band, so same wavelength = same detector), resampled through the WCSs; with Diff on it is this frame minus that median, so movers and transients stand out
 sdc=f=>{const G=F.filter(g=>g!==f&&g.a&&Math.abs(g.w-f.w)<.05);if(!G.length){f.sn=0;return}
   if(f.sk&&f.sk.d===!!df&&f.sk.m===smd)return f.sk.c;
-  const w=f.n,h=f.a.length/w,o=new Float32Array(f.a.length),v=[];
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[r,d]=p2s(f,x,y);v.length=0;const z0=f.a[y*w+x]-f.c.md;df||Number.isFinite(z0)&&v.push(z0);
-    for(const g of G){const[gx,gy]=s2p(g,r,d),i=Math.round(gx),j=Math.round(gy),gw=g.n;if(i>=0&&j>=0&&i<gw&&j<g.a.length/gw){const z=g.a[j*gw+i]-g.c.md;Number.isFinite(z)&&v.push(z)}}
+  const w=f.n,h=f.a.length/w,o=new Float32Array(f.a.length),v=[],RM=G.map(g=>rs(f,g));
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){v.length=0;const z0=f.a[y*w+x]-f.c.md;df||Number.isFinite(z0)&&v.push(z0);
+    for(const[gi,g]of G.entries()){const[gx,gy]=RM[gi](x,y),i=Math.round(gx),j=Math.round(gy),gw=g.n;if(i>=0&&j>=0&&i<gw&&j<g.a.length/gw){const z=g.a[j*gw+i]-g.c.md;Number.isFinite(z)&&v.push(z)}}
     if(!v.length){o[y*w+x]=NaN;continue}const n=v.length;let m;if(smd==0){v.sort((p,q)=>p-q);m=n&1?v[n>>1]:(v[n/2-1]+v[n/2])/2}else{m=0;for(const e of v)m+=e;if(smd==1||df)m/=n}o[y*w+x]=df?z0-m:m}
-  f.sk={d:!!df,m:smd,c:paint({w,h,a:o,div:df})};f.sn=G.length+(df?0:1);return f.sk.c},
+  f.sk={d:!!df,m:smd,c:paint({w,h,a:o,div:df,ms:df?5*sgm(f):0})};f.sn=G.length+(df?0:1);return f.sk.c},
 // CATALOGUE OVERLAYS (VizieR TAP via the Worker): Gaia DR3 (epoch 2016.0) and AllWISE (epoch ~2010.6), moved by their proper motion to each frame's date
 CT={g:{t:"I/355/gaiadr3",c:"RA_ICRS,DE_ICRS,Gmag,pmRA,pmDE",a:"RA_ICRS",b:"DE_ICRS",o:"Gmag",e:57388,n:"Gaia DR3",k:"#2fe6ff"},w:{t:"II/328/allwise",c:"RAJ2000,DEJ2000,W2mag,pmRA,pmDE",a:"RAJ2000",b:"DEJ2000",o:"W2mag",e:55400,n:"AllWISE",k:"#ff4fd8"}},
 ovf=async()=>{if(!V)return;const id=++OV.i;for(const q of["g","w"]){if(!OV[q])continue;const c=CT[q],r=+(V.z*.75).toFixed(3),ra=+V.ra.toFixed(3),de=+V.dec.toFixed(3),ky=`${ra},${de},${r}`;if(OV.k[q]===ky)continue;
@@ -282,8 +287,8 @@ function fits(buf){
 
 // asinh stretch (2%..99.5%) + brand colour ramp -> offscreen canvas (FITS rows run bottom-up, so flip y)
 const CM={gray:[[0,0,0],[72,72,72],[176,176,176],[255,255,255]],inferno:[[0,0,4],[66,10,104],[147,38,103],[221,81,58],[252,165,10],[252,255,164]],viridis:[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],ice:[[0,0,0],[10,40,110],[0,150,200],[190,240,255],[255,255,255]]},mk=A=>Array.from({length:256},(_,i)=>{const t=i/255*(A.length-1),q=Math.min(A.length-2,t|0),f=t-q;return A[q].map((c,j)=>c+(A[q+1][j]-c)*f)}),LUS=Object.fromEntries(Object.entries(CM).map(([n,a])=>[n,mk(a)])),CMN=Object.keys(CM),DV=mk([[0,220,255],[8,8,8],[255,140,0]]),NA=[24,16,40];let cm="inferno",LU=LUS[cm],SC;const BAD=[1,2,6,9,10,11,15,19].reduce((s,b)=>s|1<<b,0);
-function paint({w,h,a,div}){
-  const v=a.filter(Number.isFinite).sort(),lo=(!div&&SC?SC[0]:v[v.length*.02|0])??0,hi=(!div&&SC?SC[1]:v[v.length*.995|0])??1,m=div?Math.max(Math.abs(v[v.length*.02|0]??0),Math.abs(v[v.length*.98|0]??0))||1:1,
+function paint({w,h,a,div,ms}){
+  const v=a.filter(Number.isFinite).sort(),lo=(!div&&SC?SC[0]:v[v.length*.02|0])??0,hi=(!div&&SC?SC[1]:v[v.length*.995|0])??1,m=div?ms||Math.max(Math.abs(v[v.length*.02|0]??0),Math.abs(v[v.length*.98|0]??0))||1:1,
   c=document.createElement("canvas");c.width=w;c.height=h;c.md=v[v.length>>1];c.lo=v[v.length*.02|0]??0;c.hi=v[v.length*.995|0]??1;
   const g=c.getContext("2d"),d=g.createImageData(w,h);
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
@@ -301,49 +306,52 @@ function show(n){
   [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",b.dataset.j==k));
 }
 const stop=()=>{fl=0;clearInterval(tm);tm=0;$("pl").textContent="Play"};
-const play=()=>{if(F.length<2)return;fl=0;$("pl").textContent="Pause";tm=setInterval(()=>show(k+1),sp)};
+const nx1=()=>{for(let i=1;i<F.length;i++)if(!df||ref(F[(k+i)%F.length]))return k+i;return k+1},play=()=>{if(F.length<2)return;fl=0;$("pl").textContent="Pause";tm=setInterval(()=>show(nx1()),sp)};
 const scr=(e,t)=>{let i=0;clearInterval(e.sc);e.sc=setInterval(()=>{e.textContent=[...t].map((c,j)=>j<i||c==" "?c:"█▓▒░#%$&"[Math.random()*9|0]).join("");(i+=1.2)>=t.length&&(clearInterval(e.sc),e.textContent=t)},28)},
 toggle=()=>tm?stop():play(),
 nb=()=>{bl=0;sp=700;$("bk").classList.remove("on");document.body.classList.remove("blk")},
 bk=()=>{bl=!bl;if(bl){wm=0;sp=450;tab("t");$("bk").classList.add("on");document.body.classList.add("blk")}else nb();V&&load(V.n,V.ra,V.dec,V.z,2)};
 
-async function load(n,ra,dec,z=.25,keep){
-  !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;SC=0;
+async function load(n,ra0,dec0,z0=.25,keep){
+  let ra=ra0,dec=dec0,z=z0;const kp=keep==1,sq=t=>kp?($("lk").className=t?"lk busy":"lk",$("lk").textContent=t?"UPDATING":"DATA OK"):st(t);
+  if(kp){const g=z/8,c=Math.cos(dec*Math.PI/180);ra=+(((Math.round(ra*c/g)*g/c)%360+360)%360).toFixed(4);dec=+Math.max(-89.9,Math.min(89.9,Math.round(dec/g)*g)).toFixed(4);z=+Math.min(1,Math.max(.03,2**(Math.round(Math.log2(z)*2)/2))).toFixed(3);if(W&&F.length&&W.ra==ra&&W.dec==dec&&W.z==z)return}
+  !keep&&sk()&&tab("t");kp||(stop(),fl=1);ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;kp||(SC=0);
   const mky=`${n}|${ra}|${dec}|${z}|${wm?"s":bl?"b":"p"}`,hc=(keep||(MC={}),keep==2&&MC[mky]);
   if(hc){F=hc.F;F.forEach(f=>f.dg=f.sk=f.dc=0);SC=hc.SC;W=hc.W;$("tl").innerHTML=hc.tl;$("t0").textContent=hc.t0;$("t1").textContent=hc.t1;V={n,ra,dec,z};uu();ovf();[...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);lg("MEM","mode switch: frames restored, nothing reloaded","r");st("");bz=0;show(Math.min(hc.k,F.length-1));bl&&play();return}
-  F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
-  ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
-  V={n,ra,dec,z};uu();ovf();$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
+  kp||(F=[]);keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
+  kp||["pv","pl","nx"].forEach(i=>$(i).disabled=true);
+  V={n,ra:ra0,dec:dec0,z:z0};uu();ovf();$("bg").hidden=kp;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);kp||scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
   [...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));
-  lg("CMD",`load "${n}" · RA ${ra} · DEC ${dec} · FOV ${z}° · mode ${wm?"spectrum":bl?"blink":"pick"}${keep?" (reload)":""}`);st("Finding SPHEREx scans…");
+  lg("CMD",`load "${n}" · RA ${ra} · DEC ${dec} · FOV ${z}° · mode ${wm?"spectrum":bl?"blink":"pick"}${keep?" (reload)":""}`);sq("Finding SPHEREx scans…");
   try{
-    const x=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,keep!=1),"text/xml"),
+    const x=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,1),"text/xml"),
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),wx=f.indexOf("em_max"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[wm?w:t]-b[wm?w:t]);
     if(!R.length)return st(`No targets found: SPHEREx has no scans here yet`,1);x.getElementsByTagName("TR").length>=300&&lg("WARN","scan list hit the 300-row cap, some scans may be missing","e");
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
-    $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
-    lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
-    const res=Array(S.length);let nx=0,dn=0;const tk=new Set(S),mw=r=>(+r[w]+ +r[wx])/2*1e6;st(`Loading images 0 of ${S.length}…`);
+    const TLH=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");kp||($("tl").innerHTML=TLH);
+    lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);kp||(W={ra,dec,z});$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
+    const res=Array(S.length);let nx=0,dn=0;const tk=new Set(S),mw=r=>(+r[w]+ +r[wx])/2*1e6;sq(`Loading images 0 of ${S.length}…`);
     const one=async j=>{
-      const B=$("tl").children[j],sl=$("slots").children[j];B.classList.add("cur");sl&&(sl.className="l");
+      const B=kp?document.createElement("b"):$("tl").children[j];B.classList.add("cur");
       try{
         let r,q,b,bu;await M0;const pl=R.filter(c=>!tk.has(c)&&(!(wm||bl)||Math.abs(mw(c)-mw(S[j]))<.05)).sort((a,b)=>Math.abs(a[kx]-S[j][kx])-Math.abs(b[kx]-S[j][kx])).slice(0,3);
         for(const c of[S[j],...pl]){if(c!==S[j]&&tk.has(c))continue;r=c;bu=`${r[u]}${r[u].includes("?")?"&":"?"}center=`;
-          try{b=await G(`${bu}${ra},${dec}&size=${z}`,sg,0,keep!=1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
+          try{b=await G(`${bu}${ra},${dec}&size=${z}`,sg,0,1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
           catch(e){if(e.name=="AbortError")throw e;lg("SKIP",`${iso(+r[t])} · ${e.message||e}`,"e")}q=0}
         if(!q)throw Error("no exposure covers the target");
         const m=+r[t],wv=wl(q,...s2p(q,ra,dec)),f={c:paint(q),q,m:q.m,a:q.a,n:q.w,cr:q.cr,sip:q.sip,u:q.u,l0:wv?wv[0]-wv[1]/2:+r[w]*1e6,l1:wv?wv[0]+wv[1]/2:+r[wx]*1e6,t:m,d:iso(m),w:wv?wv[0].toFixed(2):+r[w]?(r[w]*1e6).toFixed(2):""},
-        cu=fl?f:F[k];f.fg=q.fg;res[j]=f;F=res.filter(Boolean);F.forEach(x=>x.sk=0);
-        [...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
-        B.className="tk";sl&&(sl.className="d");B.title=`${f.d} · ${f.w} µm`;
-        lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}${wv?"":" · no WCS-WAVE, band range used"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
-      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";sl&&(sl.className="x");B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
-      st(`Loading images ${++dn} of ${S.length}…`);
+        cu=fl?f:F[k];f.fg=q.fg;res[j]=f;kp||(F=res.filter(Boolean),F.forEach(x=>x.sk=0));
+        kp||[...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
+        B.className="tk";B.title=`${f.d} · ${f.w} µm`;
+        lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}${wv?"":" · no WCS-WAVE, band range used"}`,"r");kp||(["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2),show(Math.max(0,F.indexOf(cu))));
+      }catch(e){if(e.name=="AbortError")throw e;B.className="tk x";B.title="Failed";lg("ERR",`frame ${j+1} failed: ${e.message||e}`,"e")}
+      sq(`Loading images ${++dn} of ${S.length}…`);
     };
     await Promise.all(S.map((_,j)=>new Promise((ok,no)=>enq(async()=>{try{await one(j);ok()}catch(e){no(e)}}))));
+    if(kp){if(!res.some(Boolean))return st("No usable SPHEREx images for this view",1);F=res.filter(Boolean);F.forEach(x=>x.sk=0);$("tl").innerHTML=TLH;[...$("tl").children].forEach((x,i)=>{const f=res[i];x.className=f?"tk":"tk x";x.title=f?`${f.d} · ${f.w} µm`:"Failed";f&&(x.dataset.j=F.indexOf(f))});W={ra,dec,z};["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);k=Math.min(k,F.length-1);show(k)}
     if(!F.length)return st("No targets found: no usable SPHEREx images here",1);
-    st("");if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}MC[mky]={F,SC,W,k,tl:$("tl").innerHTML,t0:$("t0").textContent,t1:$("t1").textContent};Object.keys(MC).length>6&&delete MC[Object.keys(MC)[0]];bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    sq("");if(bl&&F.length>1){const ws=F.map(f=>+f.w).filter(Boolean);Math.max(...ws)-Math.min(...ws)>.1&&lg("WARN",`blink frames span ${Math.min(...ws).toFixed(2)}-${Math.max(...ws).toFixed(2)} µm at the crosshair; Diff and Stack only use frames within 0.05 µm`,"e");SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}MC[mky]={F,SC,W,k,tl:$("tl").innerHTML,t0:$("t0").textContent,t1:$("t1").textContent};Object.keys(MC).length>6&&delete MC[Object.keys(MC)[0]];bl&&!tm&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -539,7 +547,7 @@ function hud(){
   tape(w/2,w>1000?76:140,Math.min(500,w-40),0,V.ra,s*d*Math.cos(V.dec*Math.PI/180)/D,1);
   w>1000&&tape(w-30,h/2-20,Math.min(420,h-340),1,V.dec,-s*a/D,0)
 }
-const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();MC={};F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh||(localStorage.mh=1,$("hp").hidden=0)}catch{$("hp").hidden=0}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=1;{$("tb").setAttribute("role","tablist");[...$("tb").children].forEach(b=>b.setAttribute("role","tab"));const as=b=>b.setAttribute(b.getAttribute("role")=="tab"?"aria-selected":"aria-pressed",b.classList.contains("on")),mo=new MutationObserver(m=>m.forEach(r=>as(r.target)));document.querySelectorAll("#tb button,#bk,#dfb,#rfb,#stb,#gab,#wsb").forEach(b=>{as(b);mo.observe(b,{attributes:true,attributeFilter:["class"]})});new MutationObserver(()=>cv.setAttribute("aria-label",`${V?V.n:"Sky"}: frame ${$("fr").textContent}, ${$("wl").textContent}, ${$("dt").textContent}`)).observe($("wl"),{childList:true,subtree:true,characterData:true})}$("kb").onclick=()=>$("kp").hidden=!$("kp").hidden;$("kx").onclick=()=>$("kp").hidden=1;addEventListener("keydown",e=>{e.target.tagName=="INPUT"||(e.key=="?"?$("kp").hidden=!$("kp").hidden:e.key=="Escape"&&($("kp").hidden=$("hp").hidden=1))});
+const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();MC={};F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh=1}catch{}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=1;{$("tb").setAttribute("role","tablist");[...$("tb").children].forEach(b=>b.setAttribute("role","tab"));const as=b=>b.setAttribute(b.getAttribute("role")=="tab"?"aria-selected":"aria-pressed",b.classList.contains("on")),mo=new MutationObserver(m=>m.forEach(r=>as(r.target)));document.querySelectorAll("#tb button,#bk,#dfb,#rfb,#stb,#gab,#wsb").forEach(b=>{as(b);mo.observe(b,{attributes:true,attributeFilter:["class"]})});new MutationObserver(()=>cv.setAttribute("aria-label",`${V?V.n:"Sky"}: frame ${$("fr").textContent}, ${$("wl").textContent}, ${$("dt").textContent}`)).observe($("wl"),{childList:true,subtree:true,characterData:true})}$("kb").onclick=()=>$("kp").hidden=!$("kp").hidden;$("kx").onclick=()=>$("kp").hidden=1;addEventListener("keydown",e=>{e.target.tagName=="INPUT"||(e.key=="?"?$("kp").hidden=!$("kp").hidden:e.key=="Escape"&&($("kp").hidden=$("hp").hidden=1))});
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
 const mv=()=>{dirty=performance.now();co();sc();F[k]&&($("fg").textContent=flg(F[k]));spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};

@@ -4,5 +4,6 @@ README.md
 .assetsignore
 bake.mjs
 .git
+.wrangler
 plan.md
 progress.txt
