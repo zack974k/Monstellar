@@ -57,14 +57,26 @@ NOT DONE - PHASE 2 LEFTOVERS
 - A22 DETECTOR stack mode (6 deep broadband images).
 - F12 Rest: MASK BAD toggle and hatched overlay per flag family; confirm flag bits in IRSA docs.
 
-NOT DONE - PHASE 3 BUGS (next up)
-- A23 Wheel over catalog/log/help panel zooms the image.
-- A24 ?gaia=0 etc. turn features ON.
-- A25 Bad URL coordinates silently ignored.
-- A26 hms()/dms() can print 60.0s / 60".
-- A27 Delete dead mosaic code (owner said delete): mos, plc, put, rep, f.fill, ts, f.T branch in tiles(), bk variable in one(), tel. Keep the loading placeholder branch.
-- A28-A32 bake.mjs resumable, worker error handling, empty-result caching, FITS BSCALE/BZERO, MAXREC cap warning.
-- A48-A50 catalog.js row numbers, README "5 featured" -> 8, URL precision.
+DONE - PHASE 3 BUGS (rough, syntax-checked only)
+- A23 Mouse wheel over panels / catalog list / log no longer zooms the image.
+- A24 URL flags: ?gaia=0 / false / no / empty now mean OFF (stack, gaia, wise, diff, embed).
+- A25 Bad ra/dec in URL: falls back to default target and shows "BAD COORDINATES IN URL" briefly.
+- A26 hms()/dms() now reuse Z() (no more 60.0s / 60").
+- A27 Dead mosaic code DELETED (mos, plc, put, rep, f.fill, ts, f.T branch in tiles(), bk in one(), tel). Loading placeholder branch kept.
+- A28 (partial) bake.mjs writes cut/m.json after every download, so an interrupted run keeps its progress.
+- A29 (partial) worker.js: errors return 502 with CORS header; 25 s timeout on IRSA fetches.
+- A31 (partial) FITS reader applies BSCALE/BZERO on non-flag image data.
+- A32 (partial) Log warning when the scan list hits the 300-row cap (limit itself unchanged).
+- A48 catalog.js row numbers use T.length. A49 "5 featured" comment fixed, README mosaic sentence removed. A50 URL ra/dec/fov rounded.
+
+NOT DONE - PHASE 3 LEFTOVERS
+- A28 Rest: prune cut/ files not referenced by m.json; fix the NOTE.txt claim.
+- A29 Rest: separate try/catch around cut(); retry on thrown errors.
+- A30 Empty/error SIA results are not cached differently (Cache API is probably a no-op on workers.dev; needs KV/R2).
+- A31 Rest: validate the WCS-WAVE table (TFORM1/TTYPE/NAXIS1).
+- A32 Rest: MAXREC still 300.
+- A49 Rest: README other text (Spectral/Details naming is A42).
+- A50 Rest: keep q= in URL when the name came from Sesame/catalog.
 
 NOT DONE - PHASE 4 MOBILE/UX
 - A38-A47 mobile coordinate box (biggest one), jargon rename, hide log by default, first view = Blink on Barnard's Star, per-mode frame cache, naming, short-screen overflow, shortcut help overlay, accessibility, cutout reload on pan, Web Worker for heavy loops.

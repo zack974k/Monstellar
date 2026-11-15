@@ -174,24 +174,12 @@ const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["W
 const $=i=>document.getElementById(i),cv=$("c"),ctx=cv.getContext("2d"),p2=n=>String(n).padStart(2,"0"),
 P=u=>PROXY?`${PROXY}?u=${encodeURIComponent(u)}`:u,
 st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&&/^(Loading|Finding|Looking)/.test(t)?"ld":"";clearTimeout(st.k);const s0=st.s||(st.s=Date.now());e||!t?st.s=0:(function f(){$("s").dataset.e=Math.round((Date.now()-s0)/1e3)+"s";st.k=setTimeout(f,500)})();$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent="IRSA "+(e?"FAULT":t?"ACQUIRING":"NOMINAL")},
-hms=d=>{const h=(((d%360)+360)%360)/15,m=h%1*60;return`${p2(h|0)}h ${p2(m|0)}m ${(m%1*60).toFixed(1).padStart(4,"0")}s`},
-dms=d=>{const a=Math.abs(d),m=a%1*60;return`${d<0?"−":"+"}${p2(a|0)}° ${p2(m|0)}′ ${p2(Math.round(m%1*60))}″`},
-tel=(i,v,s)=>{$(i).firstChild.nodeValue=v;if(s!=null&&$(i).lastChild.tagName)$(i).lastChild.textContent=s};
+hms=d=>Z(((d%360)+360)%360/15*3600,1,1),
+dms=d=>Z(d*3600,0);
 let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,df,stk,smd=0,dr=0,sp=700;const OV={g:0,w:0,G:[],W:[],i:0,k:{}};
 const M={},M0=fetch("cut/m.json").then(r=>r.json()).then(j=>Object.assign(M,j)).catch(()=>0);
 let LD={q:[],n:0},TR=[0,0,1,1];
-const pump=()=>{const L0=LD;while(L0.n<CONC&&L0.q.length){const fn=L0.q.shift();L0.n++;fn().catch(()=>0).finally(()=>{L0.n--;L0===LD&&pump()})}},enq=(fn,front)=>{front?LD.q.unshift(fn):LD.q.push(fn);pump()},
-put=(f,q,ox,oy)=>{for(let y=0;y<q.h;y++)for(let x=0;x<q.w;x++){const X=ox+x,Y=oy+y;X>=0&&Y>=0&&X<f.W&&Y<f.H&&(f.a[Y*f.W+X]=q.a[y*q.w+x],f.fg&&q.fg&&(f.fg[Y*f.W+X]=q.fg[y*q.w+x]))}},
-plc=(f,n)=>{const w=n.w,h=n.h,E=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]].map(([x,y])=>{const[r,d]=p2s(n,x,y);return s2p(f,r,d)}),X0=Math.max(0,Math.floor(Math.min(...E.map(e=>e[0])))-1),X1=Math.min(f.W-1,Math.ceil(Math.max(...E.map(e=>e[0])))+1),Y0=Math.max(0,Math.floor(Math.min(...E.map(e=>e[1])))-1),Y1=Math.min(f.H-1,Math.ceil(Math.max(...E.map(e=>e[1])))+1);let c=0;
-  for(let Y=Y0;Y<=Y1;Y++)for(let X=X0;X<=X1;X++){const j=Y*f.W+X;if(Number.isFinite(f.a[j]))continue;const[r,d]=p2s(f,X,Y),[tx,ty]=s2p(n,r,d),i=Math.round(tx),m=Math.round(ty);if(!(i>=0&&m>=0&&i<w&&m<h))continue;const v=n.a[m*w+i];if(!Number.isFinite(v))continue;f.a[j]=v;f.fg&&n.fg&&(f.fg[j]=n.fg[m*w+i]);c++}return c},
-rep=f=>{const c=paint({w:f.W,h:f.H,a:f.a});f.c.getContext("2d").drawImage(c,0,0);f.c.md=c.md;f.sg=void 0;F.forEach(x=>{x.dg=0;x.sk=0});F[k]===f&&(ctx.drawImage(dc(),0,0),$("fg").textContent=flg(f));spec()},
-mos=(f,q,bu,ts,sg,keep,ra,dec)=>{
-  const[a0,b0,c0,d0]=q.m,sc=Math.sqrt(Math.abs(a0*d0-b0*c0))||1,S=(s=>Math.max(8,Math.abs(q.w-s)<3?q.w:s))(Math.round(ts/sc)),W=3*S+6,H=W,[cx,cy]=s2p(q,ra,dec),ox=Math.round((W-1)/2-cx),oy=Math.round((H-1)/2-cy);Object.assign(f,{S,W,H,ox,oy,G:[ox+q.w/2,H-oy-q.h/2],a:new Float32Array(W*H).fill(NaN),fg:q.fg?new Int32Array(W*H).fill(-1):void 0,n:W,cr:[q.cr[0]+ox,q.cr[1]+oy,q.cr[2],q.cr[3]],T:Array(9).fill("q")});f.T[4]="d";put(f,q,ox,oy);f.c=paint({w:W,h:H,a:f.a});
-  f.fill=()=>{f.fill=0;for(let dj=-1;dj<2;dj++)for(let di=-1;di<2;di++)(di||dj)&&enq(async()=>{
-    const i=(dj+1)*3+di+1,[p0,p1]=p2s(f,f.G[0]-.5+di*S,H-f.G[1]-.5+dj*S),rc=(p0%360+360)%360,dc=Math.max(-89.99,Math.min(89.99,p1));f.T[i]="l";
-    try{const n=fits(await G(`${bu}${rc.toFixed(5)},${dc.toFixed(5)}&size=${ts}`,sg,0,keep!=1)),pc=plc(f,n);f.T[i]="d";rep(f);lg("TILE",`tile ${di},${dj} loaded · ${n.w}×${n.h} px · ${pc} px placed`,"r")}
-    catch(e){if(e.name!="AbortError"){f.T[i]="x";lg("ERR",`tile ${di},${dj} unavailable: ${e.message||e}`,"e")}}
-  },1)}};
+const pump=()=>{const L0=LD;while(L0.n<CONC&&L0.q.length){const fn=L0.q.shift();L0.n++;fn().catch(()=>0).finally(()=>{L0.n--;L0===LD&&pump()})}},enq=(fn,front)=>{front?LD.q.unshift(fn):LD.q.push(fn);pump()};
 const lg=(k,m,c)=>{const o=$("lo"),d=document.createElement("div");d.className=c||"";d.innerHTML=`<i>${new Date().toISOString().slice(11,23)}</i><b>${k}</b>`;d.append(m);o.append(d);while(o.children.length>300)o.firstChild.remove();o.scrollTop=o.scrollHeight};
 const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg,tx,pc)=>{const kd=tx?"XML":"FITS";if(!C.has(u)){let p=FL.get(u);if(p)lg("JOIN",`${kd} already in flight, sharing it\n    ${u}`);if(!p){p=(async()=>{
   const ch=pc&&window.caches?await caches.open("mst2").catch(()=>0):0;let hit=ch&&await ch.match(u).catch(()=>0);
@@ -241,7 +229,7 @@ ovf=async()=>{if(!V)return;const id=++OV.i;for(const q of["g","w"]){if(!OV[q])co
     const L=tx.trim().split(/\r?\n/).slice(1).map(l=>l.split(",").map(parseFloat)).filter(s=>s.length>=5&&Number.isFinite(s[0])&&Number.isFinite(s[1]));
     if(id!=OV.i)return;OV[q.toUpperCase()]=L;OV.k[q]=ky;lg("CAT",`${c.n}: ${L.length} sources within ${r}°`,"r")}
   catch(e){lg("ERR",`${c.n} catalogue failed: ${e.message||e}`,"e")}}},
-uu=()=>{if(!V)return;try{history.replaceState(0,"",`?ra=${V.ra}&dec=${V.dec}&fov=${V.z}${wm?"&mode=spec":bl?"&mode=blink":""}${df?"&diff=1":""}${stk?"&stack=1":""}${smd?"&sm="+["med","mean","sum"][smd]:""}${dr?"&ref="+dr:""}${OV.g?"&gaia=1":""}${OV.w?"&wise=1":""}${/embed=1/.test(location.search)?"&embed=1":""}`)}catch{}},
+uu=()=>{if(!V)return;try{history.replaceState(0,"",`?ra=${V.ra.toFixed(5)}&dec=${V.dec.toFixed(5)}&fov=${V.z.toFixed(3)}${wm?"&mode=spec":bl?"&mode=blink":""}${df?"&diff=1":""}${stk?"&stack=1":""}${smd?"&sm="+["med","mean","sum"][smd]:""}${dr?"&ref="+dr:""}${OV.g?"&gaia=1":""}${OV.w?"&wise=1":""}${/embed=1/.test(location.search)?"&embed=1":""}`)}catch{}},
 // markers are drawn on the #to canvas with the same transform the tiles use: circle = Gaia, diamond = AllWISE; movers (>=200 mas/yr) get a 10-year track (min 18 px) and a label
 ovl=()=>{if(sk()||!V||!(OV.g||OV.w))return;const f=F[k];if(!f||!f.cr||!L)return;
   const pl=document.body.dataset.p;if(ovl.p!=pl){ovl.p=pl;ovl.A=getComputedStyle(document.body).getPropertyValue("--a").trim()||"#ffb000"}
@@ -281,7 +269,7 @@ function fits(buf){
     const nm=h.EXTNAME||"";
     if(n==2&&h.XTENSION!="BINTABLE"){
       const g={"-32":i=>dv.getFloat32(o+4*i),"-64":i=>dv.getFloat64(o+8*i),16:i=>dv.getInt16(o+2*i),32:i=>dv.getInt32(o+4*i)}[bp],a=bp==32?new Int32Array(N):new Float32Array(N);
-      for(let i=0;i<N;i++)a[i]=g(i);
+      for(let i=0;i<N;i++)a[i]=g(i);if(a instanceof Float32Array&&(h.BSCALE!=null||h.BZERO!=null)){const s1=h.BSCALE==null?1:+h.BSCALE,z1=+h.BZERO||0;for(let i=0;i<N;i++)a[i]=a[i]*s1+z1}
       const G=q=>+h[q]||0,e1=h.CDELT1==null?1:G("CDELT1"),e2=h.CDELT2==null?1:G("CDELT2"),m=h.CD1_1!=null?[G("CD1_1"),G("CD1_2"),G("CD2_1"),G("CD2_2")]:[e1*(h.PC1_1==null?1:G("PC1_1")),e1*G("PC1_2"),e2*G("PC2_1"),e2*(h.PC2_2==null?1:G("PC2_2"))];
       nm=="FLAGS"?R&&(R.fg=a):nm=="VARIANCE"?R&&(R.va=a):R||(R={w:+h.NAXIS1,h:+h.NAXIS2,a,m,cr:[G("CRPIX1"),G("CRPIX2"),G("CRVAL1"),G("CRVAL2")],u:h.BUNIT||"",wc:[G("CRPIX1W"),G("CRPIX2W")],sip:sipk(h)});
     }
@@ -306,7 +294,7 @@ function paint({w,h,a,div}){
 
 function show(n){
   if(!F.length)return;$("bg").hidden=1;
-  k=(n+F.length)%F.length;const f=F[k];f.fill&&!bz&&f.fill();L={...W,m:f.m};
+  k=(n+F.length)%F.length;const f=F[k];L={...W,m:f.m};
   cv.width=f.c.width;cv.height=f.c.height;ctx.drawImage(dc(),0,0);if(!bl&&k!=pk){pk=k;cv.classList.remove("fl");void cv.offsetWidth;cv.classList.add("fl")}
   $("wl").textContent=f.w?`${f.w} µm`:"—";$("wb").style.setProperty("--p",(+f.w?Math.min(100,Math.max(0,(f.w-.75)/.0425)):0)+"%");$("dt").textContent=f.d;$("fg").textContent=flg(f);$("fr").textContent=`${p2(k+1)} / ${p2(F.length)}`+(+f.w?` · D${1+[1.11,1.64,2.42,3.82,4.42].filter(e=>+f.w>=e).length}`:"")+(stk?(f.sn?` · STACK ${["MED","MEAN","SUM"][smd]} ×${f.sn}`:" · NO STACK"):df?(ref(f)?(ref(f)===f?" · REF":` · − ${p2(F.indexOf(ref(f))+1)}`):" · NO REF"):"");$("rfb").classList.toggle("on",!!dr);$("rfb").textContent=dr&&F.some(x=>x.t===dr)?"Ref "+p2(F.findIndex(x=>x.t===dr)+1):"Ref";sc();spec();bl&&($("bl").textContent=`BLINK · ${f.d}Z · ${f.w} µm · ${p2(k+1)}/${p2(F.length)}`);
   [...$("tl").children].forEach((b,j)=>b.classList.toggle("on",b.dataset.j==k));
@@ -329,7 +317,7 @@ async function load(n,ra,dec,z=.25,keep){
     const x=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,keep!=1),"text/xml"),
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),wx=f.indexOf("em_max"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[wm?w:t]-b[wm?w:t]);
-    if(!R.length)return st(`No targets found: SPHEREx has no scans here yet`,1);
+    if(!R.length)return st(`No targets found: SPHEREx has no scans here yet`,1);x.getElementsByTagName("TR").length>=300&&lg("WARN","scan list hit the 300-row cap, some scans may be missing","e");
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
     $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
     lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
@@ -337,13 +325,13 @@ async function load(n,ra,dec,z=.25,keep){
     const one=async j=>{
       const B=$("tl").children[j],sl=$("slots").children[j];B.classList.add("cur");sl&&(sl.className="l");
       try{
-        let r,q,b,bu,ts,bk;ts=+(z/3).toFixed(5);await M0;const pl=R.filter(c=>!tk.has(c)&&(!(wm||bl)||Math.abs(mw(c)-mw(S[j]))<.05)).sort((a,b)=>Math.abs(a[kx]-S[j][kx])-Math.abs(b[kx]-S[j][kx])).slice(0,3);
-        for(const c of[S[j],...pl]){if(c!==S[j]&&tk.has(c))continue;r=c;bu=`${r[u]}${r[u].includes("?")?"&":"?"}center=`;bk=1;
-          try{b=await G(bk?`${bu}${ra},${dec}&size=${z}`:`${bu}${ra},${dec}&size=${ts}`,sg,0,keep!=1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
+        let r,q,b,bu;await M0;const pl=R.filter(c=>!tk.has(c)&&(!(wm||bl)||Math.abs(mw(c)-mw(S[j]))<.05)).sort((a,b)=>Math.abs(a[kx]-S[j][kx])-Math.abs(b[kx]-S[j][kx])).slice(0,3);
+        for(const c of[S[j],...pl]){if(c!==S[j]&&tk.has(c))continue;r=c;bu=`${r[u]}${r[u].includes("?")?"&":"?"}center=`;
+          try{b=await G(`${bu}${ra},${dec}&size=${z}`,sg,0,keep!=1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
           catch(e){if(e.name=="AbortError")throw e;lg("SKIP",`${iso(+r[t])} · ${e.message||e}`,"e")}q=0}
         if(!q)throw Error("no exposure covers the target");
         const m=+r[t],wv=wl(q,...s2p(q,ra,dec)),f={c:paint(q),q,m:q.m,a:q.a,n:q.w,cr:q.cr,sip:q.sip,u:q.u,l0:wv?wv[0]-wv[1]/2:+r[w]*1e6,l1:wv?wv[0]+wv[1]/2:+r[wx]*1e6,t:m,d:iso(m),w:wv?wv[0].toFixed(2):+r[w]?(r[w]*1e6).toFixed(2):""},
-        cu=fl?f:F[k];bk?(f.T=Array(9).fill("d"),f.fg=q.fg):mos(f,q,bu,ts,sg,keep,ra,dec);res[j]=f;F=res.filter(Boolean);F.forEach(x=>x.sk=0);
+        cu=fl?f:F[k];f.fg=q.fg;res[j]=f;F=res.filter(Boolean);F.forEach(x=>x.sk=0);
         [...$("tl").children].forEach((x,i)=>{if(res[i])x.dataset.j=F.indexOf(res[i])});
         B.className="tk";sl&&(sl.className="d");B.title=`${f.d} · ${f.w} µm`;
         lg("LOAD",`frame ${j+1}/${S.length} ready · ${f.w} µm · ${f.d} · ${q.w}×${q.a.length/q.w} px · ${(b.byteLength/1024).toFixed(0)} KB · ${q.u||"no unit"}${wv?"":" · no WCS-WAVE, band range used"}`,"r");["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);show(Math.max(0,F.indexOf(cu)));
@@ -352,7 +340,7 @@ async function load(n,ra,dec,z=.25,keep){
     };
     await Promise.all(S.map((_,j)=>new Promise((ok,no)=>enq(async()=>{try{await one(j);ok()}catch(e){no(e)}}))));
     if(!F.length)return st("No targets found: no usable SPHEREx images here",1);
-    st("");F[k]?.fill?.();if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    st("");if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -528,8 +516,7 @@ function tiles(t){
   tg.setTransform(q,0,0,q,0,0);tg.clearRect(0,0,w,h);
   if(sk()||!V)return;
   const f=F[k];let R;
-  if(f&&f.T){if(f.T.every(e=>e=="d"))return;const S=f.S,[tx,ty,B,s0]=TR;R=f.T.map((e,i)=>{const di=i%3-1,dj=(i/3|0)-1,x0=f.G[0]+di*S-S/2,y0=f.G[1]-dj*S-S/2;return[e,w/2+tx+B*s0*(x0-cv.width/2),h/2+ty+B*s0*(y0-cv.height/2),B*s0*S,B*s0*S]})}
-  else if(!F.length&&cv.width<=1){const S=Math.min(w,h)*.2;R=Array.from({length:9},(_,i)=>[i==4?"l":"q",w/2+(i%3-1.5)*S,h/2+((i/3|0)-1.5)*S,S,S])}
+  if(!F.length&&cv.width<=1){const S=Math.min(w,h)*.2;R=Array.from({length:9},(_,i)=>[i==4?"l":"q",w/2+(i%3-1.5)*S,h/2+((i/3|0)-1.5)*S,S,S])}
   else return;
   const A=getComputedStyle(document.body).getPropertyValue("--a").trim()||"#ffb000",p=.5+.5*Math.sin(t/180);
   for(const[e,x,y,Wd,Ht]of R){if(e=="d")continue;tg.save();tg.beginPath();tg.rect(x,y,Wd,Ht);tg.clip();
@@ -564,7 +551,7 @@ cv.onpointermove=e=>{const o=PT.get(e.pointerId);if(!o)return;PT.set(e.pointerId
   if(PT.size>1){zm(hy([...PT.values()].find(v=>v.pointerId!=e.pointerId),o)/hy([...PT.values()].find(v=>v.pointerId!=e.pointerId),e));dg=1;return}
   const dx=e.clientX-o.clientX,dy=e.clientY-o.clientY,s=Math[fit()?"min":"max"](innerWidth/cv.width,innerHeight/cv.height)*L.z/V.z;
   pd+=Math.abs(dx)+Math.abs(dy);if(pd>6){dg=1;pn(-dx/s,-dy/s)}};
-addEventListener("wheel",e=>{if(V&&L&&!sk()&&!e.target.closest("#nav")){e.preventDefault();zm(Math.exp(e.deltaY*.0015))}},{passive:false});
+addEventListener("wheel",e=>{if(V&&L&&!sk()&&!e.target.closest(".pnl,#nav,#cl,#lo")){e.preventDefault();zm(Math.exp(e.deltaY*.0015))}},{passive:false});
 requestAnimationFrame(function tick(t){
   const dt=Math.min(.05,(t-lt)/1e3)||0;lt=t;
   if(V&&L){
@@ -582,10 +569,10 @@ requestAnimationFrame(function tick(t){
 addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
 { // URL params: ?ra=&dec= (deg or sexagesimal) | ?q=name &fov=0.25 &mode=blink|spec &diff=1 &embed=1
-  const Q=new URLSearchParams(location.search),c=Q.get("ra")&&Q.get("dec")?sx(Q.get("ra")+" "+Q.get("dec")):0,md=Q.get("mode"),z=Math.min(1,Math.max(.03,+Q.get("fov")||.25));
-  wm=md=="spec";stk=!!Q.get("stack");smd=Math.max(0,["med","mean","sum"].indexOf(Q.get("sm")));dr=+Q.get("ref")||0;$("smb").textContent=["MED","MEAN","SUM"][smd];OV.g=!!Q.get("gaia");OV.w=!!Q.get("wise");bl=md=="blink"||stk&&!wm;["stb","gab","wsb"].forEach((i,j)=>$(i).classList.toggle("on",!![stk,OV.g,OV.w][j]));bl&&(sp=450,$("bk").classList.add("on"),document.body.classList.add("blk"));wm&&tab("sp");Q.get("diff")&&$("dfb").click();Q.get("embed")&&document.body.classList.add("hide");
+  const Q=new URLSearchParams(location.search),on=k=>!["","0","false","no"].includes((Q.get(k)||"").toLowerCase()),c=Q.get("ra")&&Q.get("dec")?sx(Q.get("ra")+" "+Q.get("dec")):0,md=Q.get("mode"),z=Math.min(1,Math.max(.03,+Q.get("fov")||.25));
+  wm=md=="spec";stk=on("stack");smd=Math.max(0,["med","mean","sum"].indexOf(Q.get("sm")));dr=+Q.get("ref")||0;$("smb").textContent=["MED","MEAN","SUM"][smd];OV.g=on("gaia");OV.w=on("wise");bl=md=="blink"||stk&&!wm;["stb","gab","wsb"].forEach((i,j)=>$(i).classList.toggle("on",!![stk,OV.g,OV.w][j]));bl&&(sp=450,$("bk").classList.add("on"),document.body.classList.add("blk"));wm&&tab("sp");on("diff")&&$("dfb").click();on("embed")&&document.body.classList.add("hide");
   if(Q.get("q")){$("q").value=Q.get("q");$("f").requestSubmit()}else if(c)load("Custom",c[0],c[1],z);
-  else load(...T[0])}
+  else{load(...T[0]);Q.get("ra")&&Q.get("dec")&&setTimeout(()=>st("BAD COORDINATES IN URL · SHOWING DEFAULT",1),300)}}
 </script>
 <script src="targets.js"></script><script src="catalog.js"></script>
 </body>

@@ -1,6 +1,6 @@
 // Monstellar catalog add-on. Load AFTER the main script and targets.js:
 //   <script src="targets.js"></script><script src="catalog.js"></script>
-// Adds a searchable list of all targets directly under the 5 featured targets,
+// Adds a searchable list of all targets directly under the featured targets,
 // and exact-name matching in the CMD box. Uses the main script's globals ($, load, V).
 (()=>{
 const CAT=typeof CATALOG!="undefined"?CATALOG:[];
@@ -33,7 +33,7 @@ const fill=q=>{
     const b=document.createElement("button"),s=document.createElement("span");
     b.dataset.n=n;b.className=n==cur?"on":"";
     b.title=`${ty} · RA ${ra}° Dec ${dec}°`;
-    b.append(pad(i+6),s);s.textContent=n;
+    b.append(pad(i+1+T.length),s);s.textContent=n;
     b.onclick=()=>load(n,ra,dec);return b;
   }));
   if(!m.length){const d=document.createElement("div");d.textContent="NO MATCHING TARGETS";$("cl").append(d)}

@@ -21,5 +21,5 @@ for(const[nm,ra,dec]of T){
   for(const r of S){const cu=`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`;M[cu]&&ex(M[cu])||q.some(z=>z[0]==cu)||q.push([cu,nm])}
   console.log(nm,R.length,"scans,",S.length,"frames picked")}
 let d=0,fail=0,mb=0;
-await Promise.all(Array.from({length:4},async()=>{while(q.length){const[cu,nm]=q.shift();try{const b=cut(await get(cu)),p=`cut/${hs(cu)}.fits`;wr(p,b);M[cu]=p;mb+=b.length/1e6}catch(e){fail++;console.log("FAIL",nm,String(e).slice(0,80))}d++;process.stdout.write(`\r${d} done, ${fail} failed, ${mb.toFixed(1)} MB  `)}}));
+await Promise.all(Array.from({length:4},async()=>{while(q.length){const[cu,nm]=q.shift();try{const b=cut(await get(cu)),p=`cut/${hs(cu)}.fits`;wr(p,b);M[cu]=p;mb+=b.length/1e6;wr("cut/m.json",JSON.stringify(M))}catch(e){fail++;console.log("FAIL",nm,String(e).slice(0,80))}d++;process.stdout.write(`\r${d} done, ${fail} failed, ${mb.toFixed(1)} MB  `)}}));
 wr("cut/m.json",JSON.stringify(M));console.log(`\nm.json: ${Object.keys(M).length} entries. frames are trimmed to the first image. Now: git add cut && git commit && deploy`)
