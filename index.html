@@ -176,7 +176,7 @@ P=u=>PROXY?`${PROXY}?u=${encodeURIComponent(u)}`:u,
 st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&&/^(Loading|Finding|Looking)/.test(t)?"ld":"";clearTimeout(st.k);const s0=st.s||(st.s=Date.now());e||!t?st.s=0:(function f(){$("s").dataset.e=Math.round((Date.now()-s0)/1e3)+"s";st.k=setTimeout(f,500)})();$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent=e?"DATA ERROR":t?"LOADING":"DATA OK"},
 hms=d=>Z(((d%360)+360)%360/15*3600,1,1),
 dms=d=>Z(d*3600,0);
-let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,df,stk,smd=0,dr=0,sp=700;const OV={g:0,w:0,G:[],W:[],i:0,k:{}};
+let MC={},F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,df,stk,smd=0,dr=0,sp=700;const OV={g:0,w:0,G:[],W:[],i:0,k:{}};
 const M={},M0=fetch("cut/m.json").then(r=>r.json()).then(j=>Object.assign(M,j)).catch(()=>0);
 let LD={q:[],n:0},TR=[0,0,1,1];
 const pump=()=>{const L0=LD;while(L0.n<CONC&&L0.q.length){const fn=L0.q.shift();L0.n++;fn().catch(()=>0).finally(()=>{L0.n--;L0===LD&&pump()})}},enq=(fn,front)=>{front?LD.q.unshift(fn):LD.q.push(fn);pump()};
@@ -308,6 +308,8 @@ bk=()=>{bl=!bl;if(bl){wm=0;sp=450;tab("t");$("bk").classList.add("on");document.
 
 async function load(n,ra,dec,z=.25,keep){
   !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;SC=0;
+  const mky=`${n}|${ra}|${dec}|${z}|${wm?"s":bl?"b":"p"}`,hc=(keep||(MC={}),keep==2&&MC[mky]);
+  if(hc){F=hc.F;F.forEach(f=>f.dg=f.sk=f.dc=0);SC=hc.SC;W=hc.W;$("tl").innerHTML=hc.tl;$("t0").textContent=hc.t0;$("t1").textContent=hc.t1;V={n,ra,dec,z};uu();ovf();[...$("nav").children].forEach(b=>b.classList.toggle("on",b.dataset.n==n));["pv","pl","nx"].forEach(i=>$(i).disabled=F.length<2);lg("MEM","mode switch: frames restored, nothing reloaded","r");st("");bz=0;show(Math.min(hc.k,F.length-1));bl&&play();return}
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
   V={n,ra,dec,z};uu();ovf();$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
@@ -340,7 +342,7 @@ async function load(n,ra,dec,z=.25,keep){
     };
     await Promise.all(S.map((_,j)=>new Promise((ok,no)=>enq(async()=>{try{await one(j);ok()}catch(e){no(e)}}))));
     if(!F.length)return st("No targets found: no usable SPHEREx images here",1);
-    st("");if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    st("");if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}MC[mky]={F,SC,W,k,tl:$("tl").innerHTML,t0:$("t0").textContent,t1:$("t1").textContent};Object.keys(MC).length>6&&delete MC[Object.keys(MC)[0]];bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -536,7 +538,7 @@ function hud(){
   tape(w/2,w>1000?76:140,Math.min(500,w-40),0,V.ra,s*d*Math.cos(V.dec*Math.PI/180)/D,1);
   w>1000&&tape(w-30,h/2-20,Math.min(420,h-340),1,V.dec,-s*a/D,0)
 }
-const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh||(localStorage.mh=1,$("hp").hidden=0)}catch{$("hp").hidden=0}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=1;
+const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();MC={};F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh||(localStorage.mh=1,$("hp").hidden=0)}catch{$("hp").hidden=0}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=1;
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
 const mv=()=>{dirty=performance.now();co();sc();F[k]&&($("fg").textContent=flg(F[k]));spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
