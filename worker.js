@@ -78,7 +78,7 @@ const s3cut=async u=>{
 const H=async(r,env,ctx)=>{
   const u=new URL(r.url).searchParams.get("u"),h={"access-control-allow-origin":"*","access-control-expose-headers":"x-src"};
   if(u===null)return env.ASSETS?env.ASSETS.fetch(r):new Response("Monstellar proxy",{headers:h});
-  if(!/^https:\/\/(irsa\.ipac\.caltech\.edu\/(SIA\?|ibe\/)|(cds|tapvizier\.cds)\.unistra\.fr\/)/.test(u))return new Response("forbidden",{status:403,headers:h});
+  if(!/^https:\/\/(irsa\.ipac\.caltech\.edu\/(?:SIA\?|TAP\/sync\?|ibe\/)|(cds|tapvizier\.cds)\.unistra\.fr\/)/.test(u))return new Response("forbidden",{status:403,headers:h});
   const c=caches.default,k=new Request(u+(u.includes("?")?"&":"?")+"_v=4");let x=await c.match(k),src=x?"cache-"+(x.headers.get("x-src")||"?"):"";
   if(!x){
     if(/center=/.test(u)&&/\/ibe\/data\/spherex\//.test(u)&&!/[?&]nos3=1/.test(r.url)){try{const b=await s3cut(u);b&&(x=new Response(b,{headers:{"content-type":"application/fits"}}),src="s3")}catch(e){src="irsa (s3 failed: "+String(e.message||e).replace(/[^\x20-\x7e]/g,"").slice(0,80)+")";x=0}}
