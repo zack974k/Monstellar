@@ -50,7 +50,7 @@ body[data-tab=t] #sp,body[data-tab=t] #ob,body[data-tab=sp] #gt,body[data-tab=sp
 #nav button.on{background:var(--a);color:#000;border-left-color:var(--a)}#nav button.on span{color:#000}
 #sc{display:block;width:100%;height:auto}.chip.on{background:var(--a);color:#000}.chip.on::before,.ctl>button.on::before{content:"\25CF "}
 #f{display:flex;align-items:center;gap:10px;padding:9px 12px}
-#f::before{content:"CMD>";font:700 12px var(--disp);letter-spacing:.2em;color:var(--a)}
+#f::before{content:"GO TO";font:700 12px var(--disp);letter-spacing:.2em;color:var(--a)}
 #f input{flex:1;min-width:0;font-size:13px;caret-color:var(--a)}#f input::placeholder{color:var(--lb)}
 #tt{font:700 22px/1.05 var(--disp);letter-spacing:.06em;text-transform:uppercase;padding-bottom:10px;margin-bottom:10px;border-bottom:1px solid var(--ln)}
 dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px}
@@ -123,7 +123,7 @@ body[data-tab=sk] #sr{display:block}
 @media(max-width:1000px){
   .brand span,#utc,.keys{display:none}.brand b{font-size:14px;letter-spacing:.2em}.lk{font-size:0}.tools{gap:8px}
   .tabs{left:10px;top:42px;transform:none}#lc{top:80px;left:10px;right:10px;width:auto}#gt{gap:10px}#nav{flex-direction:row;overflow:auto;scrollbar-width:none}#nav button{flex:none;padding:0 12px}
-  #f{display:none}
+  #f{order:-1;padding:6px 10px}#f::before{font-size:11px}#f input{font-size:16px}
   #tt{font-size:16px}#wl{font-size:26px;min-height:26px}.sc{flex-direction:column;align-items:flex-start}.sc>div{align-items:flex-start}
   .ctl{left:10px;right:10px;bottom:10px;gap:6px;overflow-x:auto}.ctl>button{padding:0 9px;flex:none}#tl{min-width:70px}#t0,#t1{display:none}#s{bottom:76px}
 }
@@ -138,20 +138,20 @@ body[data-tab=sk] #sr{display:block}
 <div id="s">Select a target</div><div id="slots" class="ui"></div>
 <div id="pg" class="ui"></div>
 <div id="bl" class="ui pnl"></div>
-<div id="lg" class="ui pnl"><h2>Cmd log</h2><div class="pb"><div id="lo"></div></div></div>
+<div id="lg" class="ui pnl"><h2>Log</h2><div class="pb"><div id="lo"></div></div></div>
 <div id="lmp" class="ui pnl" hidden><h2>Limits</h2><div class="pb">Exploration tool, not a detection. SPHEREx frames from different dates also differ in wavelength, so a brightness change alone is not proof of motion: Blink only pairs frames within 0.05 µm, more than 1 h apart. The ice readout is a quick look (3×3 median minus field median, 3σ), not a calibrated product. Data: NASA/IPAC IRSA, SPHEREx QR3.</div></div>
-<div id="hp" class="ui pnl" hidden><h2>How to read this</h2><div class="pb"><p><b>What is this?</b> SPHEREx is a NASA space telescope photographing the whole sky in infrared light, split into about 100 colours. This page shows its real images of one spot of sky.</p><p><b>1 · Pick a target</b> on the left (or type coordinates / a name in CMD). Images come from NASA's archive, which can take a minute.</p><p><b>2 · Step through the images</b> with ‹ › or Play. Each one is the same spot at a different colour (µm) and date, shown at the bottom.</p><p><b>3 · Open the Spectrum tab</b> (top, or press 2): brightness at the crosshair for each colour. Dips at 3.05, 4.27 and 4.67 µm mean ice (water, CO₂, CO), where planets and comets form.</p><ul><li><b>Blink</b> flips between dates to spot things that move or change</li><li><b>Diff</b> subtracts the previous image</li><li><b>Gaia / WISE</b> mark known stars and infrared sources</li><li><b>Sky</b> tab: click anywhere on the map to look there</li></ul><button class="chip" id="hx">GOT IT</button></div></div>
+<div id="hp" class="ui pnl" hidden><h2>How to read this</h2><div class="pb"><p><b>What is this?</b> SPHEREx is a NASA space telescope photographing the whole sky in infrared light, split into about 100 colours. This page shows its real images of one spot of sky.</p><p><b>1 · Pick a target</b> on the left (or type coordinates / a name in the GO TO box). Images come from NASA's archive, which can take a minute.</p><p><b>2 · Step through the images</b> with ‹ › or Play. Each one is the same spot at a different colour (µm) and date, shown at the bottom.</p><p><b>3 · Open the Spectrum tab</b> (top, or press 2): brightness at the crosshair for each colour. Dips at 3.05, 4.27 and 4.67 µm mean ice (water, CO₂, CO), where planets and comets form.</p><ul><li><b>Blink</b> flips between dates to spot things that move or change</li><li><b>Diff</b> subtracts the previous image</li><li><b>Gaia / WISE</b> mark known stars and infrared sources</li><li><b>Sky</b> tab: click anywhere on the map to look there</li></ul><button class="chip" id="hx">GOT IT</button></div></div>
 <div id="sr" class="ui pnl">SKY MAP · CLICK ANYWHERE TO LOAD SPHEREx</div>
 <div class="ui brand"><b>MONSTELLAR</b><span>SPHEREx survey viewer // IRSA</span></div>
 <div class="ui tabs" id="tb"><button class="on" data-t="t" title="Pick a target and browse its images">Target</button><button data-t="sp" title="Brightness vs colour, with ice detection">Spectrum</button><button data-t="ob" title="Colour, date and quality of the current image">Details</button><button data-t="sk" title="All-sky map: click anywhere to look there">Sky</button></div>
-<div class="ui tools"><span id="lk" class="lk">IRSA NOMINAL</span><span id="utc"></span><button class="chip" id="hlp">? HELP</button><button class="chip" id="lgb">LOG</button><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Interface accent color (C)">UI AMB</button><button class="chip" id="cmb" title="Image colormap: how brightness is colored">MAP INFERNO</button>
+<div class="ui tools"><span id="lk" class="lk">DATA OK</span><span id="utc"></span><button class="chip" id="hlp">? HELP</button><button class="chip" id="lgb">LOG</button><button class="chip" id="lm">LIMITS</button><button class="chip" id="pal" title="Interface accent color (C)">UI AMB</button><button class="chip" id="cmb" title="Image colormap: how brightness is colored">MAP INFERNO</button>
   <button class="ic" id="fs" title="Fullscreen (F) · Hide interface (H) · Fit image (Z) · Move (WASD) · Zoom (+/− or scroll) · Drag/pinch · Speed ([ ]) · Wavelength order (M)" aria-label="Fullscreen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5"/></svg></button></div>
 <div id="lc" class="ui">
 <div id="gt">
 <nav id="nav" class="ui"></nav>
-<aside id="tg" class="ui pnl"><h2>Target lock</h2><div class="pb"><div id="tt"></div>
+<aside id="tg" class="ui pnl"><h2>Target</h2><div class="pb"><div id="tt"></div>
   <dl><dt>RA</dt><dd id="ra"></dd><dt>Dec</dt><dd id="de"></dd><dt>FOV</dt><dd id="fv"></dd></dl></div></aside>
-<form id="f" class="ui pnl"><input id="q" placeholder="RA, DEC (DEG)" autocomplete="off" aria-label="RA, Dec in degrees"></form>
+<form id="f" class="ui pnl"><input id="q" placeholder="Name or RA, Dec" autocomplete="off" aria-label="RA, Dec in degrees"></form>
 </div>
 <aside id="sp" class="ui pnl"><h2>Spectrum</h2><div class="pb"><canvas id="sc" width="360" height="190" title="3×3 median at the crosshair, per band. Bright squares = crosshair, dots = field median. Move with WASD / drag."></canvas><div class="wr"><span id="sx"></span><span class="bt"><button class="chip" id="so" title="Hear the spectrum: pitch = wavelength, loudness = flux, chime = detected ice">▶ SONIFY</button><button class="chip" id="sv" title="Download CSV">CSV</button></span></div><div id="ic"></div></div></aside>
 <aside id="ob" class="ui pnl"><h2>Spectral</h2><div class="pb"><div id="wl"></div><div id="wb"></div><div class="wr"><span>0.75</span><span>5.00 µm</span></div>
@@ -173,7 +173,7 @@ const PROXY="https://monstellar.gundegmaamunxjargal.workers.dev";
 const T=[["Barnard's Star",269.452,4.693],["Epsilon Indi B",331.077,-56.783],["WISE 0855",133.795,-7.245],["RW Aurigae",76.956,30.401],["R Draconis",248.125,66.764],["W33A (ice-rich)",273.6625,-17.867],["NGC 7538 IRS 9",348.507,61.456],["Elias 29",246.789,-24.622]];
 const $=i=>document.getElementById(i),cv=$("c"),ctx=cv.getContext("2d"),p2=n=>String(n).padStart(2,"0"),
 P=u=>PROXY?`${PROXY}?u=${encodeURIComponent(u)}`:u,
-st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&&/^(Loading|Finding|Looking)/.test(t)?"ld":"";clearTimeout(st.k);const s0=st.s||(st.s=Date.now());e||!t?st.s=0:(function f(){$("s").dataset.e=Math.round((Date.now()-s0)/1e3)+"s";st.k=setTimeout(f,500)})();$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent="IRSA "+(e?"FAULT":t?"ACQUIRING":"NOMINAL")},
+st=(t,e)=>{$("s").hidden=!t;$("s").textContent=t||"";$("s").className=e?"err":t&&/^(Loading|Finding|Looking)/.test(t)?"ld":"";clearTimeout(st.k);const s0=st.s||(st.s=Date.now());e||!t?st.s=0:(function f(){$("s").dataset.e=Math.round((Date.now()-s0)/1e3)+"s";st.k=setTimeout(f,500)})();$("lk").className=e?"lk err":t?"lk busy":"lk";$("lk").textContent=e?"DATA ERROR":t?"LOADING":"DATA OK"},
 hms=d=>Z(((d%360)+360)%360/15*3600,1,1),
 dms=d=>Z(d*3600,0);
 let F=[],k=0,tm,ac,V,L,W,dirty,bz,fl,hk,wm,bl,pk,df,stk,smd=0,dr=0,sp=700;const OV={g:0,w:0,G:[],W:[],i:0,k:{}};
@@ -536,7 +536,7 @@ function hud(){
   tape(w/2,w>1000?76:140,Math.min(500,w-40),0,V.ra,s*d*Math.cos(V.dec*Math.PI/180)/D,1);
   w>1000&&tape(w-30,h/2-20,Math.min(420,h-340),1,V.dec,-s*a/D,0)
 }
-const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh||(localStorage.mh=1,$("hp").hidden=0)}catch{$("hp").hidden=0}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=innerWidth<1000;
+const pal=()=>{const P=["amb","grn","cyn","mono"],b=document.body,n=P[(P.indexOf(b.dataset.p)+1)%4];b.dataset.p=n;$("pal").textContent="UI "+n.toUpperCase();spec()};$("pal").onclick=pal;$("cmb").onclick=()=>{cm=CMN[(CMN.indexOf(cm)+1)%CMN.length];LU=LUS[cm];$("cmb").textContent="MAP "+cm.toUpperCase();F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});F.length&&show(k)};$("bk").onclick=bk;$("lm").onclick=()=>$("lmp").hidden=!$("lmp").hidden;$("hlp").onclick=()=>$("hp").hidden=!$("hp").hidden;$("hx").onclick=()=>$("hp").hidden=1;try{localStorage.mh||(localStorage.mh=1,$("hp").hidden=0)}catch{$("hp").hidden=0}$("lgb").onclick=()=>$("lg").hidden=!$("lg").hidden;$("lg").hidden=1;
 // WASD pans, +/- or wheel zooms: canvas moves/scales instantly via CSS, then the cutouts reload around the new view
 const K=new Set,N={"+":"=",_:"-"};let lt=0;
 const mv=()=>{dirty=performance.now();co();sc();F[k]&&($("fg").textContent=flg(F[k]));spec()},zm=f=>{V.z=Math.min(1,Math.max(.03,V.z*f));mv()};
