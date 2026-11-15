@@ -361,7 +361,7 @@ async function load(n,ra0,dec0,z0=.25,keep){
       try{
         let r,q,b,bu;await M0;const pl=R.filter(c=>!tk.has(c)&&(!(wm||bl)||Math.abs(mw(c)-mw(S[j]))<.05)).sort((a,b)=>Math.abs(a[kx]-S[j][kx])-Math.abs(b[kx]-S[j][kx])).slice(0,3);
         for(const c of[S[j],...pl]){if(c!==S[j]&&tk.has(c))continue;r=c;bu=`${r[u]}${r[u].includes("?")?"&":"?"}center=`;
-          try{b=await G(`${bu}${ra},${dec}&size=${z}`,sg,0,1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
+          try{b=await G(`${bu}${ra},${dec}d&size=${z}`,sg,0,1);if(sg.aborted)return;q=fits(b);const[px,py]=s2p(q,ra,dec);if(px>=-.5&&py>=-.5&&px<q.w-.5&&py<q.h-.5){tk.add(r);break}lg("SKIP",`${iso(+r[t])} · target is ${Math.round(Math.max(-px,-py,px-q.w+1,py-q.h+1))} px off this exposure, trying another`,"e")}
           catch(e){if(e.name=="AbortError")throw e;lg("SKIP",`${iso(+r[t])} · ${e.message||e}`,"e")}q=0}
         if(!q)throw Error("no exposure covers the target");
         const m=+r[t],wv=wl(q,...s2p(q,ra,dec)),f={c:paint(q),q,m:q.m,a:q.a,n:q.w,cr:q.cr,sip:q.sip,u:q.u,l0:wv?wv[0]-wv[1]/2:+r[w]*1e6,l1:wv?wv[0]+wv[1]/2:+r[wx]*1e6,t:m,d:iso(m),w:wv?wv[0].toFixed(2):+r[w]?(r[w]*1e6).toFixed(2):""},
