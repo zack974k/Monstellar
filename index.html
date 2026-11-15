@@ -192,7 +192,7 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
   if(hit){C.set(u,await hit[tx?"text":"arrayBuffer"]());lg("HIT",`${kd} from browser cache · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}\n    ${u}`,"r")}
   else if(await M0,M[u]){C.set(u,await(await fetch(M[u]))[tx?"text":"arrayBuffer"]());lg("BAKE",`${kd} from pre-baked ${M[u]} · ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"}`,"r")}
   else{for(let n=0;;n++){const t0=performance.now(),ms=()=>Math.round(performance.now()-t0)+" ms";try{
-      lg("TX",`GET ${u}\n    via ${PROXY||"direct"} · try ${n+1}/4 · timeout ${tx?30:90}s`);
+      lg("TX",`GET ${u}\n    via ${PROXY||"direct"} · try ${n+1}/2 · timeout ${tx?30:90}s`);
       const r=await fetch(P(u),{signal:AbortSignal.timeout(tx?3e4:9e4)});
       const src=r.headers.get("x-src"),ct=r.headers.get("content-type")||"?";
       lg("RX",`HTTP ${r.status} ${r.statusText} · ${ct}${src?" [src "+src+"]":""} · headers in ${ms()}`,r.ok?"r":"e");
@@ -205,8 +205,8 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
       C.set(u,await r[tx?"text":"arrayBuffer"]());
       lg("RX",`${kd} body ${tx?C.get(u).length+" chars":(C.get(u).byteLength/1024).toFixed(1)+" KB"} complete in ${ms()}`,"r");break;
     }catch(e){
-      const retryable=e.name==="TypeError"||e.name==="TimeoutError"||e.name==="NetworkError"||e.status===408||e.status===425||e.status===429||(e.status>=500&&e.status<=599);
-      const retry=n<3&&retryable&&e.name!=="AbortError";
+      const retryable=e.name==="TypeError"||e.name==="TimeoutError"||e.name==="NetworkError"||e.status===408||e.status===425||e.status===429;
+      const retry=n<1&&retryable&&e.name!=="AbortError";
       lg("ERR",`${e.message||e.name} after ${ms()}${retry?" · retrying":" · "+(retryable?"retry limit reached":"not retryable")}`,"e");
       if(!retry)throw e;
       const ra=Number(e.retryAfter),delay=Number.isFinite(ra)&&ra>0?Math.min(ra*1000,8000):500*2**n;
@@ -217,7 +217,7 @@ const C=new Map,FL=new Map,AE=()=>new DOMException("","AbortError"),G=async(u,sg
   await Promise.race([p,new Promise((_,r)=>sg.aborted?r(AE()):sg.addEventListener("abort",()=>r(AE()),{once:true}))])}else lg("MEM",`${kd} from memory\n    ${u}`,"r");
   if(sg.aborted)throw AE();return C.get(u)};
 const pick=R=>Array.from({length:Math.min(5,R.length)},(_,i)=>R[Math.round(i*(R.length-1)/Math.max(Math.min(5,R.length)-1,1))]),pre=async(ra,dec)=>{try{const x=await DISC(ra,dec,new AbortController().signal),f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/"));await Promise.all(pick(R).map(r=>G(`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`,new AbortController().signal,0,1)))}catch{}},SIA=(ra,dec)=>`https://irsa.ipac.caltech.edu/SIA?COLLECTION=spherex_qr3&POS=circle+${ra}+${dec}+0.02&MAXREC=300`,
-TAP=(ra,dec)=>{const q=`SELECT 'https://irsa.ipac.caltech.edu/' || a.uri AS access_url, p.time_bounds_lower AS t_min FROM spherex.artifact a JOIN spherex.plane p ON a.planeid=p.planeid WHERE 1=CONTAINS(POINT('ICRS',${ra},${dec}),p.poly) ORDER BY p.time_bounds_lower`;return `https://irsa.ipac.caltech.edu/TAP/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable&QUERY=${encodeURIComponent(q)}`},
+TAP=(ra,dec)=>{const q=`SELECT 'https://irsa.ipac.caltech.edu/' || a.uri AS access_url, p.time_bounds_lower AS t_min FROM spherex.artifact a JOIN spherex.plane p ON a.planeid=p.planeid WHERE 1=CONTAINS(POINT('ICRS',${ra},${dec}),p.poly) ORDER BY p.time_bounds_lower`;return `https://irsa.ipac.caltech.edu/TAP/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=votable&MAXREC=300&QUERY=${encodeURIComponent(q)}`},
 DISC=async(ra,dec,sg)=>{try{const d=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,1),"text/xml"),f=[...d.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url");if(d.querySelector("parsererror")||u<0||![...d.getElementsByTagName("TR")].some(r=>(r.getElementsByTagName("TD")[u]?.textContent||"").includes("/ibe/")))throw Error("SIA2 returned no usable observations");lg("DISC","IRSA SIA2 discovery succeeded","r");return d}catch(e){if(sg.aborted)throw e;lg("WARN",`SIA2 failed: ${e.message||e}; switching to IRSA TAP`,"e")}
   const d=new DOMParser().parseFromString(await G(TAP(ra,dec),sg,1,1),"text/xml"),f=[...d.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url");if(d.querySelector("parsererror")||u<0||![...d.getElementsByTagName("TR")].some(r=>(r.getElementsByTagName("TD")[u]?.textContent||"").includes("/ibe/")))throw Error("IRSA TAP returned no usable observations");lg("DISC","IRSA TAP fallback succeeded","r");return d},
 warm=(ra,dec)=>DISC(ra,dec,new AbortController().signal).catch(e=>lg("WARN",`background discovery failed: ${e.message||e}`,"e")),CONC=8,sk=()=>document.body.dataset.tab=="sk";
