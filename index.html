@@ -48,7 +48,7 @@ body[data-tab=t] #sp,body[data-tab=t] #ob,body[data-tab=sp] #gt,body[data-tab=sp
 #nav button span{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#nav button small{display:none}
 #nav button:hover{background:color-mix(in srgb,var(--a) 18%,transparent)}
 #nav button.on{background:var(--a);color:#000;border-left-color:var(--a)}#nav button.on span{color:#000}
-#sc{display:block;width:100%;height:auto}.chip.on{background:var(--a);color:#000}
+#sc{display:block;width:100%;height:auto}.chip.on{background:var(--a);color:#000}.chip.on::before,.ctl>button.on::before{content:"\25CF "}
 #f{display:flex;align-items:center;gap:10px;padding:9px 12px}
 #f::before{content:"CMD>";font:700 12px var(--disp);letter-spacing:.2em;color:var(--a)}
 #f input{flex:1;min-width:0;font-size:13px;caret-color:var(--a)}#f input::placeholder{color:var(--lb)}
@@ -220,7 +220,7 @@ FN={0:"TRANSIENT",1:"OVERFLOW",2:"SUR_ERROR",6:"NONFUNC",7:"DICHROIC",9:"MISSING
 flg=f=>{if(!f.fg)return"n/a";const w=f.n,h=f.fg.length/w,[x,y]=s2p(f,V.ra,V.dec).map(Math.round);let m=0,c=0;for(let j=-1;j<2;j++)for(let i=-1;i<2;i++){const X=x+i,Y=y+j,v=X>=0&&Y>=0&&X<w&&Y<h?f.fg[Y*w+X]:-1;v>=0&&(m|=v,c++)}if(!c)return"n/a";const n=Object.keys(FN).filter(b=>m>>b&1).map(b=>FN[b]);return n.length?n.join(" "):"CLEAR"},
 // DIFF: this frame minus the previous one, resampled onto this frame's grid through both WCSs (same-band frames only make physical sense)
 dc=()=>{const f=F[k],g=ref(f);if(stk){const s=sdc(f);if(s)return s}if(!df||!g||g===f)return f.c;if(f.dg!==g){const w=f.n,h=f.a.length/w,gw=g.n,gh=g.a.length/gw,o=new Float32Array(f.a.length);for(let y=0;y<h;y++)for(let x=0;x<w;x++){const[r,d]=p2s(f,x,y),[gx,gy]=s2p(g,r,d),i=Math.round(gx),j=Math.round(gy);o[y*w+x]=f.a[y*w+x]-f.c.md-((i>=0&&j>=0&&i<gw&&j<gh?g.a[j*gw+i]:NaN)-g.c.md)}f.dg=g;f.dc=paint({w,h,a:o,div:1})}return f.dc};
-$("dfb").onclick=()=>{df=!df;$("dfb").classList.toggle("on",df);F.length&&show(k)};
+$("dfb").onclick=()=>{df=!df;$("dfb").classList.toggle("on",df);df&&!bl&&(st("DIFF ACROSS BANDS IS NOT MEANINGFUL · PRESS B FOR BLINK"),setTimeout(()=>!bz&&st(""),4000));F.length&&show(k)};
 // SIP distortion polynomial (A/B terms, pixel offsets from CRPIX); s2p inverts it by fixed-point iteration
 const spf=(L,u,v)=>{let s=0;for(const[p,q,c]of L)s+=c*u**p*v**q;return s},
 // Diff reference: the pinned frame (matched by MJD so it survives reloads), else the previous frame
@@ -288,14 +288,14 @@ function fits(buf){
     if(nm=="WCS-WAVE"&&R){const k=parseInt(h.TFORM1),r=i=>dv.getInt32(o+4*i);R.wv={X:Array.from({length:k},(_,i)=>r(i)),Y:Array.from({length:k},(_,i)=>r(k+i)),V:Array.from({length:2*k*k},(_,i)=>dv.getFloat32(o+8*k+4*i))}}
     o+=Math.ceil(by*(+h.GCOUNT||1)*(N+(+h.PCOUNT||0))/2880)*2880;
   }
-  if(R)return R;throw Error("no image in FITS");
+  if(R){if(R.fg&&R.a instanceof Float32Array)for(let i=0;i<R.a.length;i++)R.fg[i]&BAD&&(R.a[i]=NaN);return R}throw Error("no image in FITS");
 }
 
 // asinh stretch (2%..99.5%) + brand colour ramp -> offscreen canvas (FITS rows run bottom-up, so flip y)
-const CM={gray:[[0,0,0],[72,72,72],[176,176,176],[255,255,255]],inferno:[[0,0,4],[66,10,104],[147,38,103],[221,81,58],[252,165,10],[252,255,164]],viridis:[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],ice:[[0,0,0],[10,40,110],[0,150,200],[190,240,255],[255,255,255]]},mk=A=>Array.from({length:256},(_,i)=>{const t=i/255*(A.length-1),q=Math.min(A.length-2,t|0),f=t-q;return A[q].map((c,j)=>c+(A[q+1][j]-c)*f)}),LUS=Object.fromEntries(Object.entries(CM).map(([n,a])=>[n,mk(a)])),CMN=Object.keys(CM),DV=mk([[0,220,255],[8,8,8],[255,140,0]]),NA=[24,16,40];let cm="inferno",LU=LUS[cm];
+const CM={gray:[[0,0,0],[72,72,72],[176,176,176],[255,255,255]],inferno:[[0,0,4],[66,10,104],[147,38,103],[221,81,58],[252,165,10],[252,255,164]],viridis:[[68,1,84],[59,82,139],[33,145,140],[94,201,98],[253,231,37]],ice:[[0,0,0],[10,40,110],[0,150,200],[190,240,255],[255,255,255]]},mk=A=>Array.from({length:256},(_,i)=>{const t=i/255*(A.length-1),q=Math.min(A.length-2,t|0),f=t-q;return A[q].map((c,j)=>c+(A[q+1][j]-c)*f)}),LUS=Object.fromEntries(Object.entries(CM).map(([n,a])=>[n,mk(a)])),CMN=Object.keys(CM),DV=mk([[0,220,255],[8,8,8],[255,140,0]]),NA=[24,16,40];let cm="inferno",LU=LUS[cm],SC;const BAD=[1,2,6,9,10,11,15,19].reduce((s,b)=>s|1<<b,0);
 function paint({w,h,a,div}){
-  const v=a.filter(Number.isFinite).sort(),lo=v[v.length*.02|0]??0,hi=v[v.length*.995|0]??1,m=div?Math.max(Math.abs(v[v.length*.02|0]??0),Math.abs(v[v.length*.98|0]??0))||1:1,
-  c=document.createElement("canvas");c.width=w;c.height=h;c.md=v[v.length>>1];
+  const v=a.filter(Number.isFinite).sort(),lo=(!div&&SC?SC[0]:v[v.length*.02|0])??0,hi=(!div&&SC?SC[1]:v[v.length*.995|0])??1,m=div?Math.max(Math.abs(v[v.length*.02|0]??0),Math.abs(v[v.length*.98|0]??0))||1:1,
+  c=document.createElement("canvas");c.width=w;c.height=h;c.md=v[v.length>>1];c.lo=v[v.length*.02|0]??0;c.hi=v[v.length*.995|0]??1;
   const g=c.getContext("2d"),d=g.createImageData(w,h);
   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
     const p=a[(h-1-y)*w+x],t=div?Math.min(1,Math.max(0,.5+.5*Math.asinh(8*p/m)/Math.asinh(8))):Math.asinh(10*Math.min(1,Math.max(0,(p-lo)/(hi-lo||1))))/Math.asinh(10);
@@ -319,7 +319,7 @@ nb=()=>{bl=0;sp=700;$("bk").classList.remove("on");document.body.classList.remov
 bk=()=>{bl=!bl;if(bl){wm=0;sp=450;tab("t");$("bk").classList.add("on");document.body.classList.add("blk")}else nb();V&&load(V.n,V.ra,V.dec,V.z,2)};
 
 async function load(n,ra,dec,z=.25,keep){
-  !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;
+  !keep&&sk()&&tab("t");stop();fl=1;ac?.abort();LD={q:[],n:0};ac=new AbortController;const sg=ac.signal;bz=1;SC=0;
   F=[];keep||(cv.width=cv.height=1,ctx.clearRect(0,0,1,1),L=0,cv.style.transform="",$("tl").innerHTML="");
   ["pv","pl","nx"].forEach(i=>$(i).disabled=true);
   V={n,ra,dec,z};uu();ovf();$("bg").hidden=0;keep||($("bg").src=`https://alasky.cds.unistra.fr/hips-image-services/hips2fits?hips=CDS/P/DSS2/color&width=960&height=540&fov=${z}&projection=TAN&coordsys=icrs&ra=${ra}&dec=${dec}&format=jpg`);scr($("tt"),n);co();keep||(["wl","dt","fr","t0","t1"].forEach(i=>$(i).textContent=""),$("wb").style.setProperty("--p","0%"));
@@ -329,7 +329,7 @@ async function load(n,ra,dec,z=.25,keep){
     const x=new DOMParser().parseFromString(await G(SIA(ra,dec),sg,1,keep!=1),"text/xml"),
     f=[...x.getElementsByTagName("FIELD")].map(e=>e.getAttribute("name")),u=f.indexOf("access_url"),t=f.indexOf("t_min"),w=f.indexOf("em_min"),wx=f.indexOf("em_max"),
     R=[...x.getElementsByTagName("TR")].map(r=>[...r.getElementsByTagName("TD")].map(d=>d.textContent.trim())).filter(r=>(r[u]||"").includes("/ibe/")).sort((a,b)=>a[wm?w:t]-b[wm?w:t]);
-    if(!R.length)return st(`No SPHEREx scans cover this target yet`,1);
+    if(!R.length)return st(`No targets found: SPHEREx has no scans here yet`,1);
     const S=(wm?ladder(R,w,wx):bl?blink(R,w,wx,t):pick(R)),iso=m=>m?new Date((m-40587)*864e5).toISOString().slice(0,bl?16:10).replace("T"," "):"—",kx=wm?w:t,t0=+S[0][kx],t1=+S[S.length-1][kx],lb=v=>wm?(v*1e6).toFixed(2)+" µm":iso(v);
     $("tl").innerHTML=S.map((r,j)=>`<button class="tk ld cur" title="Loading…" style="left:calc(8px + (100% - 16px)*${t1>t0?(r[kx]-t0)/(t1-t0):j/Math.max(S.length-1,1)});--h:${6+(Math.min(5,Math.max(.75,+(r[w]*1e6)||1))-.75)/4.25*14}px"><i></i></button>`).join("");
     lg("LOAD",`${R.length} scans cover target · requesting ${S.length} frames in parallel`);W={ra,dec,z};$("t0").textContent=lb(t0);$("t1").textContent=lb(t1);
@@ -351,8 +351,8 @@ async function load(n,ra,dec,z=.25,keep){
       st(`Loading images ${++dn} of ${S.length}…`);
     };
     await Promise.all(S.map((_,j)=>new Promise((ok,no)=>enq(async()=>{try{await one(j);ok()}catch(e){no(e)}}))));
-    if(!F.length)return st("No usable images came back from IRSA",1);
-    st("");F[k]?.fill?.();bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
+    if(!F.length)return st("No targets found: no usable SPHEREx images here",1);
+    st("");F[k]?.fill?.();if(bl&&F.length>1){SC=[Math.min(...F.map(f=>f.c.lo)),Math.max(...F.map(f=>f.c.hi))];F.forEach(f=>{f.c=paint({w:f.n,h:f.a.length/f.n,a:f.a});f.dg=0;f.sk=0;f.dc=0});show(k)}bl&&play();dirty=(V.ra!=ra||V.dec!=dec||V.z!=z)&&performance.now();
   }catch(e){
     if(e.name=="AbortError")return;
     console.error(e);
@@ -385,10 +385,10 @@ addEventListener("keydown",e=>{if(e.target.tagName=="INPUT"||e.metaKey||e.ctrlKe
 const sm=(f,p)=>{const[a,b,c,d]=f.m,D=a*d-b*c;if(!D||!f.cr)return NaN;const[ix,iy]=s2p(f,p.ra,p.dec).map(Math.round),
   w=f.n,h=f.a.length/w;if(ix<1||iy<1||ix>w-2||iy>h-2)return NaN;
   const v=[];for(let j=-1;j<2;j++)for(let i=-1;i<2;i++){const z=f.a[(iy+j)*w+ix+i];Number.isFinite(z)&&v.push(z)}return v.length<5?NaN:v.sort((x,y)=>x-y)[v.length>>1]},
-spd=()=>F.map((f,i)=>({f,i,x:(f.l0+(f.l1||f.l0))/2,y:sm(f,V)})).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map(p=>({...p,n:p.y-p.f.c.md,e:sgm(p.f)})).sort((a,b)=>a.x-b.x);
+spd=()=>F.map((f,i)=>{const w=f.q&&f.cr?wl(f.q,...s2p(f,V.ra,V.dec)):0;return{f,i,x:w?w[0]:(f.l0+(f.l1||f.l0))/2,y:sm(f,V)}}).filter(p=>Number.isFinite(p.x)&&Number.isFinite(p.y)).map(p=>({...p,n:p.y-p.f.c.md,e:sgm(p.f)})).sort((a,b)=>a.x-b.x);
 // ICE DETECTOR. Per band: net flux = 3x3 median at the crosshair - field median; continuum = interpolation between flanking windows; depth = (continuum - band)/continuum; noise = robust (MAD) pixel scatter of each frame
 const sgm=f=>f.sg??(f.sg=(()=>{const va=f.q?.va;if(va){const s=Float32Array.from(va).filter(Number.isFinite).sort();return Math.sqrt(s[s.length>>1])||NaN}const v=f.a.filter(Number.isFinite).sort(),m=v[v.length>>1],d=v.map(x=>Math.abs(x-m)).sort();return d[d.length>>1]*1.4826||NaN})()),
-ICE=[{n:"H₂O",l:3.05,b:[2.8,3.3],c:[[2.55,2.75],[3.55,3.8]]},{n:"CO₂",l:4.27,b:[4.22,4.32],c:[[4,4.16],[4.38,4.55]]},{n:"CO",l:4.67,b:[4.64,4.7],c:[[4.5,4.6],[4.74,4.9]]}],
+ICE=[{n:"H₂O",l:3.05,b:[2.8,3.3],c:[[2.55,2.75],[3.55,3.8]]},{n:"CO₂",l:4.27,b:[4.22,4.32],c:[[4,4.16],[4.38,4.42]]},{n:"CO",l:4.67,b:[4.64,4.7],c:[[4.5,4.6],[4.74,4.9]]}],
 ice=pt=>ICE.map(F=>{
   const sel=([a,b])=>pt.filter(p=>p.x>=a&&p.x<=b&&Number.isFinite(p.n)&&Number.isFinite(p.e)),B=sel(F.b),L=sel(F.c[0]),R=sel(F.c[1]);
   if(!B.length||!L.length||!R.length)return{F,s:"cov"};
@@ -397,8 +397,8 @@ ice=pt=>ICE.map(F=>{
   cb=wl*mn(L)+wr*mn(R),sc=Math.sqrt(wl*wl*vr(L)/L.length+wr*wr*vr(R)/R.length),d=cb-mn(B),sd=Math.sqrt(vr(B)/B.length+sc*sc),
   o={F,cb,pl:[xl,mn(L)+md(L)],pr:[xr,mn(R)+md(R)],dep:d/cb,eb:sd/cb,sig:d/sd,ul:3*sd/cb};
   o.s=!(cb>3*sc)?"faint":o.sig>=3&&o.dep>.03?"yes":o.sig<=-3?"em":"no";return o}),
-rIce=R=>{const D=R.filter(r=>r.s=="yes"),pc=x=>(x*100).toFixed(1)+"%",TX={yes:"DETECTED",no:"NOT DETECTED",faint:"TOO FAINT",cov:"NO COVERAGE",em:"EXCESS"},
-  hl=D.length?"ICE DETECTED · "+D.map(r=>r.F.n).join(" + "):R.some(r=>r.s=="no")?"NO ICE ABSORPTION DETECTED":R.some(r=>r.s=="faint")?"SOURCE TOO FAINT AT THESE BANDS":"LOAD MORE IMAGES TO CHECK FOR ICE",
+rIce=R=>{const D=R.filter(r=>r.s=="yes"),pc=x=>(x*100).toFixed(1)+"%",TX={yes:"DIP",no:"NO DIP",faint:"TOO FAINT",cov:"NO COVERAGE",em:"EXCESS"},
+  hl=D.length?"ICE-BAND DIP CANDIDATE · "+D.map(r=>r.F.n).join(" + "):R.some(r=>r.s=="no")?"NO ICE-BAND DIP SEEN":R.some(r=>r.s=="faint")?"SOURCE TOO FAINT AT THESE BANDS":"LOAD MORE IMAGES TO CHECK FOR ICE",
   h=`<div class="ih${D.length?" hit":""}">${hl}</div>`+R.map(r=>`<div class="ir ${r.s}"><b>${r.F.n} · ${r.F.l} µm</b><span>${TX[r.s]}</span><small>${r.s=="yes"?`depth ${pc(r.dep)} ± ${pc(r.eb)} · ${r.sig.toFixed(1)}σ`:r.s=="no"?`depth < ${pc(r.ul)} (3σ limit)`:r.s=="em"?`flux excess ${pc(-r.dep)} · ${(-r.sig).toFixed(1)}σ`:r.s=="faint"?"continuum below 3σ noise":"needs more colours in this window"}</small></div>`).join("")+`<div class="in">Quick look: 3×3 median at the crosshair minus field median, continuum from the flanking bands. Not a calibrated science product.</div>`;
   if(rIce.k!==h){rIce.k=h;$("ic").innerHTML=h}};
 // SONIFY: sweep the spectrum 0.75 -> 5 µm. Pitch = wavelength (short = high), loudness = net flux, chime = detected ice band
