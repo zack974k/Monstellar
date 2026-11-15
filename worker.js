@@ -79,16 +79,27 @@ const H=async(r,env,ctx)=>{
   const u=new URL(r.url).searchParams.get("u"),h={"access-control-allow-origin":"*","access-control-expose-headers":"x-src"};
   if(u===null)return env.ASSETS?env.ASSETS.fetch(r):new Response("Monstellar proxy",{headers:h});
   if(!/^https:\/\/(irsa\.ipac\.caltech\.edu\/(SIA\?|ibe\/)|(cds|tapvizier\.cds)\.unistra\.fr\/)/.test(u))return new Response("forbidden",{status:403,headers:h});
-  const c=caches.default,k=new Request(u+(u.includes("?")?"&":"?")+"_v=3");let x=await c.match(k),src=x?"cache-"+(x.headers.get("x-src")||"?"):"";
+  const c=caches.default,k=new Request(u+(u.includes("?")?"&":"?")+"_v=4");let x=await c.match(k),src=x?"cache-"+(x.headers.get("x-src")||"?"):"";
   if(!x){
     if(/center=/.test(u)&&/\/ibe\/data\/spherex\//.test(u)&&!/[?&]nos3=1/.test(r.url)){try{const b=await s3cut(u);b&&(x=new Response(b,{headers:{"content-type":"application/fits"}}),src="s3")}catch(e){src="irsa (s3 failed: "+String(e.message||e).replace(/[^\x20-\x7e]/g,"").slice(0,80)+")";x=0}}
     if(!x){
       src=src.startsWith("irsa")?src:"irsa";
-      for(let i=0;i<2;i++){x=await fetch(u,{signal:AbortSignal.timeout(25e3)});if(x.status<500)break}
+      for(let i=0;i<3;i++){
+        try{
+          x=await fetch(u,{signal:AbortSignal.timeout(25e3)});
+          if(x.status<500&&x.status!==429)break;
+          if(i===2)break;
+          const ra=Number(x.headers.get("retry-after"));
+          await new Promise(r=>setTimeout(r,Number.isFinite(ra)&&ra>0?Math.min(ra*1000,8000):500*2**i));
+        }catch(e){
+          if(i===2)throw e;
+          await new Promise(r=>setTimeout(r,500*2**i));
+        }
+      }
       if(x.ok&&/center=/.test(u))x=new Response(cut(await x.arrayBuffer()),{headers:{"content-type":"application/fits"}});
     }
     if(x.ok)ctx.waitUntil(c.put(k,new Response(x.clone().body,{headers:{"content-type":x.headers.get("content-type")||"application/octet-stream","cache-control":"public,max-age=2592000,immutable","x-src":src.split(" ")[0]}})));
   }
   return new Response(x.body,{status:x.status,headers:{...h,"content-type":x.headers.get("content-type")||"application/octet-stream","x-src":src}});
 };
-export default{async fetch(r,env,ctx){try{return await H(r,env,ctx)}catch(e){return new Response("proxy error: "+e,{status:502,headers:{"access-control-allow-origin":"*"}})}}}
+export default{async fetch(r,env,ctx){try{return await H(r,env,ctx)}catch(e){return new Response("proxy error: "+String(e&&e.message||e),{status:502,headers:{"access-control-allow-origin":"*","access-control-expose-headers":"x-src","content-type":"text/plain; charset=utf-8","x-src":"worker"}})}}}
