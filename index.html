@@ -569,10 +569,10 @@ requestAnimationFrame(function tick(t){
 addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
 const ck=()=>$("utc").textContent=new Date().toISOString().slice(0,19).replace("T"," ")+"Z";ck();setInterval(ck,1e3);
 { // URL params: ?ra=&dec= (deg or sexagesimal) | ?q=name &fov=0.25 &mode=blink|spec &diff=1 &embed=1
-  const Q=new URLSearchParams(location.search),on=k=>!["","0","false","no"].includes((Q.get(k)||"").toLowerCase()),c=Q.get("ra")&&Q.get("dec")?sx(Q.get("ra")+" "+Q.get("dec")):0,md=Q.get("mode"),z=Math.min(1,Math.max(.03,+Q.get("fov")||.25));
+  const Q=new URLSearchParams(location.search),fv=!location.search&&(()=>{try{return!localStorage.mb&&(localStorage.mb=1)}catch{return 0}})(),on=k=>!["","0","false","no"].includes((Q.get(k)||"").toLowerCase()),c=Q.get("ra")&&Q.get("dec")?sx(Q.get("ra")+" "+Q.get("dec")):0,md=Q.get("mode")||(fv?"blink":""),z=Math.min(1,Math.max(.03,+Q.get("fov")||.25));
   wm=md=="spec";stk=on("stack");smd=Math.max(0,["med","mean","sum"].indexOf(Q.get("sm")));dr=+Q.get("ref")||0;$("smb").textContent=["MED","MEAN","SUM"][smd];OV.g=on("gaia");OV.w=on("wise");bl=md=="blink"||stk&&!wm;["stb","gab","wsb"].forEach((i,j)=>$(i).classList.toggle("on",!![stk,OV.g,OV.w][j]));bl&&(sp=450,$("bk").classList.add("on"),document.body.classList.add("blk"));wm&&tab("sp");on("diff")&&$("dfb").click();on("embed")&&document.body.classList.add("hide");
   if(Q.get("q")){$("q").value=Q.get("q");$("f").requestSubmit()}else if(c)load("Custom",c[0],c[1],z);
-  else{load(...T[0]);Q.get("ra")&&Q.get("dec")&&setTimeout(()=>st("BAD COORDINATES IN URL · SHOWING DEFAULT",1),300)}}
+  else{Promise.resolve(load(...T[0])).then(()=>{if(fv){const s=$("s");s.hidden=0;s.className="";s.textContent="Watch Barnard's Star move";setTimeout(()=>s.textContent=="Watch Barnard's Star move"&&(s.hidden=1),8e3)}});Q.get("ra")&&Q.get("dec")&&setTimeout(()=>st("BAD COORDINATES IN URL · SHOWING DEFAULT",1),300)}}
 </script>
 <script src="targets.js"></script><script src="catalog.js"></script>
 </body>
