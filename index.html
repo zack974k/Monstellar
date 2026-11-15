@@ -566,7 +566,7 @@ requestAnimationFrame(function tick(t){
     const tx=-(d*u-b*w)/D*s,ty=(a*w-c*u)/D*s;cv.style.transform=`translate(${tx}px,${ty}px) scale(${L.z/V.z})`;TR=[tx,ty,L.z/V.z,Math[document.body.classList.contains("fit")?"min":"max"](innerWidth/cv.width,innerHeight/cv.height)];
   }
   hud();
-  tiles(t);ovl();if(dirty&&!bz&&t-dirty>350){dirty=0;load(V.n,V.ra,V.dec,V.z,1)}
+  tiles(t);ovl();if(dirty&&!bz&&t-dirty>350){dirty=0;const dx=((V.ra-W.ra+540)%360-180)*Math.cos(V.dec*Math.PI/180),dy=V.dec-W.dec,r=V.z/W.z;(Math.hypot(dx,dy)>.15*W.z||r>1.25||r<.8)&&load(V.n,V.ra,V.dec,V.z,1)}
   requestAnimationFrame(tick)
 });
 addEventListener("pointermove",e=>{const f=$("fx").style;f.setProperty("--mx",e.clientX+"px");f.setProperty("--my",e.clientY+"px")});
