@@ -11,7 +11,7 @@ css.textContent=`
 #cw{display:flex;flex-direction:column;gap:6px}
 #cq{width:100%;padding:7px 12px;font-size:13px;caret-color:var(--a);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln)}
 #cq::placeholder{color:var(--lb)}
-#cl{max-height:clamp(90px,calc(100vh - 640px),260px);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent;overscroll-behavior:contain;display:flex;flex-direction:column;gap:2px}
+#cl{max-height:clamp(60px,calc(100vh - 780px),260px);overflow:auto;scrollbar-width:thin;scrollbar-color:var(--a) transparent;overscroll-behavior:contain;display:flex;flex-direction:column;gap:2px}
 #cl button{flex:none;height:30px;display:flex;align-items:center;gap:12px;padding:0 12px;text-align:left;font:600 13px var(--disp);letter-spacing:.14em;text-transform:uppercase;color:var(--lb);background:color-mix(in srgb,var(--a) 8%,transparent);border-left:2px solid var(--ln);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:background .15s}
 #cl button span{color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #cl button:hover{background:color-mix(in srgb,var(--a) 18%,transparent)}

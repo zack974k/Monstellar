@@ -18,7 +18,7 @@ for(const[nm,ra,dec]of T){
   Rt=[...R].sort((a,b)=>a[t]-b[t]),Rw=[...R].sort((a,b)=>a[w]-b[w]);
   if(!R.length){console.log(nm,"no scans");continue}
   const S=[...(Md.includes("pick")?pick(Rt):[]),...(Md.includes("ladder")?ladder(Rw,w,wx):[]),...(Md.includes("blink")?blink(Rt,w,wx,t):[])];
-  for(const r of S){const cu=`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`;M[cu]&&ex(M[cu])||q.some(z=>z[0]==cu)||q.push([cu,nm])}
+  for(const r of S){const cu=`${r[u]}${r[u].includes("?")?"&":"?"}center=${ra},${dec}&size=0.25`;M[cu]&&ex(M[cu])&&rd(M[cu]).includes("WCS-WAVE")||q.some(z=>z[0]==cu)||q.push([cu,nm])}
   console.log(nm,R.length,"scans,",S.length,"frames picked")}
 let d=0,fail=0,mb=0;
 await Promise.all(Array.from({length:4},async()=>{while(q.length){const[cu,nm]=q.shift();try{const b=cut(await get(cu)),p=`cut/${hs(cu)}.fits`;wr(p,b);M[cu]=p;mb+=b.length/1e6;wr("cut/m.json",JSON.stringify(M))}catch(e){fail++;console.log("FAIL",nm,String(e).slice(0,80))}d++;process.stdout.write(`\r${d} done, ${fail} failed, ${mb.toFixed(1)} MB  `)}}));
