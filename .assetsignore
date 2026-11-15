@@ -2,3 +2,5 @@ worker.js
 wrangler.jsonc
 README.md
 .assetsignore
+bake.mjs
+.git
