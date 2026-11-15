@@ -79,7 +79,7 @@ const H=async(r,env,ctx)=>{
   const u=new URL(r.url).searchParams.get("u"),h={"access-control-allow-origin":"*","access-control-expose-headers":"x-src,x-upstream-status,x-upstream-server,x-upstream-request-id"};
   if(u===null)return env.ASSETS?env.ASSETS.fetch(r):new Response("Monstellar proxy",{headers:h});
   if(!/^https:\/\/(irsa\.ipac\.caltech\.edu\/(?:SIA\?|TAP\/sync\?|ibe\/)|(cds|tapvizier\.cds)\.unistra\.fr\/)/.test(u))return new Response("forbidden",{status:403,headers:h});
-  const c=caches.default,k=new Request(u+(u.includes("?")?"&":"?")+"_v=4");let x=await c.match(k),src=x?"cache-"+(x.headers.get("x-src")||"?"):"";
+  const c=caches.default,k=new Request(u+(u.includes("?")?"&":"?")+"_v=4");let x=await c.match(k),src=x?"cache-"+(x.headers.get("x-src")||"?"):"",upstreamMeta={};
   if(!x){
     if(/center=/.test(u)&&/\/ibe\/data\/spherex\//.test(u)&&!/[?&]nos3=1/.test(r.url)){try{const b=await s3cut(u);b&&(x=new Response(b,{headers:{"content-type":"application/fits"}}),src="s3")}catch(e){src="irsa (s3 failed: "+String(e.message||e).replace(/[^\x20-\x7e]/g,"").slice(0,80)+")";x=0}}
     if(!x){
@@ -96,11 +96,11 @@ const H=async(r,env,ctx)=>{
           await new Promise(r=>setTimeout(r,500*2**i));
         }
       }
-      if(x&&!x.ok){const body=(await x.clone().text()).slice(0,1200),upstream={status:x.status,host:new URL(u).hostname,path:new URL(u).pathname,contentType:x.headers.get("content-type")||"",server:x.headers.get("server")||"",requestId:x.headers.get("x-request-id")||x.headers.get("cf-ray")||"",body};console.error("[monstellar:upstream-error]",JSON.stringify(upstream));x.headers.set("x-upstream-status",String(x.status));x.headers.set("x-upstream-server",upstream.server.slice(0,120));if(upstream.requestId)x.headers.set("x-upstream-request-id",upstream.requestId.slice(0,120))}
+      if(x&&!x.ok){const body=(await x.clone().text()).slice(0,1200),upstream={status:x.status,host:new URL(u).hostname,path:new URL(u).pathname,contentType:x.headers.get("content-type")||"",server:x.headers.get("server")||"",requestId:x.headers.get("x-request-id")||x.headers.get("cf-ray")||"",body};console.error("[monstellar:upstream-error]",JSON.stringify(upstream));upstreamMeta={"x-upstream-status":String(x.status),"x-upstream-server":upstream.server.slice(0,120),"x-upstream-request-id":upstream.requestId.slice(0,120)}}
     if(x.ok&&/center=/.test(u))x=new Response(cut(await x.arrayBuffer()),{headers:{"content-type":"application/fits"}});
     }
     if(x.ok)ctx.waitUntil(c.put(k,new Response(x.clone().body,{headers:{"content-type":x.headers.get("content-type")||"application/octet-stream","cache-control":"public,max-age=2592000,immutable","x-src":src.split(" ")[0]}})));
   }
-  return new Response(x.body,{status:x.status,headers:{...h,"content-type":x.headers.get("content-type")||"application/octet-stream","x-src":src,"x-upstream-status":x.headers.get("x-upstream-status")||String(x.status),"x-upstream-server":x.headers.get("x-upstream-server")||"","x-upstream-request-id":x.headers.get("x-upstream-request-id")||""}});
+  return new Response(x.body,{status:x.status,headers:{...h,"content-type":x.headers.get("content-type")||"application/octet-stream","x-src":src,"x-upstream-status":upstreamMeta["x-upstream-status"]||String(x.status),"x-upstream-server":upstreamMeta["x-upstream-server"]||"","x-upstream-request-id":upstreamMeta["x-upstream-request-id"]||""}});
 };
 export default{async fetch(r,env,ctx){try{return await H(r,env,ctx)}catch(e){return new Response("proxy error: "+String(e&&e.message||e),{status:502,headers:{"access-control-allow-origin":"*","access-control-expose-headers":"x-src","content-type":"text/plain; charset=utf-8","x-src":"worker"}})}}}
